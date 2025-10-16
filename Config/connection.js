@@ -1,6 +1,7 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-import {Pool} from 'pg';
+import { Pool } from "pg";
+import { Sequelize } from "sequelize";
 
 const host = process.env.HOST;
 const user = process.env.USER;
@@ -8,29 +9,33 @@ const password = process.env.PASSWORD;
 const database = process.env.DATABASE;
 const port = process.env.PORT;
 
-
+const hostg = process.env.HOSTG;
+const userg = process.env.USERG;
+const passwordg = process.env.PASSWORDG;
+const databaseg = process.env.DATABASEG;
+const portg = process.env.PORTG;
 console.log(host);
 
-const pool = new Pool({
+const databaseConnection = new Sequelize(database, user, password, {
+  host: host,
+  dialect: "postgres",
+  port: port,
+});
 
-    host: host,
-    user: user,
-    password: `${password}`,
-    database: database,
-    port: port
+const pool = new Pool({
+  host: hostg,
+  user: userg,
+  password: `${passwordg}`,
+  database: databaseg,
+  port: portg,
 });
 
 pool.connect((err, res) => {
-
-    if(err){
-        console.log(err);
-    }else{
-
-
-        console.log("Conectado con exito");
-    }
-
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("Conectado con exito");
+  }
 });
 
-
-export default pool;
+export default { pool, databaseConnection };
