@@ -84,6 +84,48 @@ export const Propiedad = Sequelize.define("propiedad", {
     type: DataTypes.DOUBLE,
     allowNull: false,
   },
+
+  num_estacionamiento: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  plantas: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  residencial: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  jardin: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  alberca: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  sotano: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  terraza: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  cuarto_servicio: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  muebles: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  credito: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+
   fecha_registro: {
     type: DataTypes.DATE,
     allowNull: false,
