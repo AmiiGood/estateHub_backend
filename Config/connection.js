@@ -16,12 +16,13 @@ const databaseg = process.env.DATABASEG;
 const portg = process.env.PORTG;
 console.log(host);
 
-const databaseConnection = new Sequelize(database, user, password, {
-  host: host,
+const databaseConnection = new Sequelize(databaseg, userg, `${passwordg}`, {
+  host: hostg,
   dialect: "postgres",
-  port: port,
+  port: portg,
 });
 
+/*
 const pool = new Pool({
   host: hostg,
   user: userg,
@@ -38,4 +39,6 @@ pool.connect((err, res) => {
   }
 });
 
-export default { pool, databaseConnection };
+*/
+
+export default databaseConnection;

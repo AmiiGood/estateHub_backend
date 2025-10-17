@@ -1,13 +1,14 @@
-const { Sequelize, DataTypes } = require("sequelize");
+import { Sequelize, DataTypes } from "sequelize";
+import databaseConnection from "../Config/connection.js";
 
-export const Propiedad = Sequelize.define("propiedad", {
+export const Propiedad = databaseConnection.define("propiedad", {
   idPropiedad: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
 
-  IdUsuario: {
+  idUsuario: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -26,11 +27,11 @@ export const Propiedad = Sequelize.define("propiedad", {
     allowNull: false,
   },
   latitud: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   longitud: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   colonia: {
