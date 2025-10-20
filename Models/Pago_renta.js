@@ -1,16 +1,20 @@
-import { Sequelize, DataTypes, DATE } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 import databaseConnection from "../Config/connection";
 
-export const PagoRenta = databaseConnection.define("pagos_renta", {
-    id_pago: {
+export const PagoRenta = databaseConnection.define("pagosRenta", {
+    idPago: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
 
-    id_contrato: {
+    idContrato: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            model: "contratos",
+            key: "idContrato"
+        }
     },
 
     monto: {
@@ -18,12 +22,12 @@ export const PagoRenta = databaseConnection.define("pagos_renta", {
         allowNull: false
     },
 
-    fecha_vencimiento: {
+    fechaVencimiento: {
         type: DataTypes.DATE,
         allowNull: false
     },
 
-    fecha_pago: {
+    fechaPago: {
         type: DataTypes.DATE,
         allowNull: false
     },
@@ -33,7 +37,7 @@ export const PagoRenta = databaseConnection.define("pagos_renta", {
         allowNull: false
     },
 
-    metodo_pago: {
+    metodoPago: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -47,9 +51,12 @@ export const PagoRenta = databaseConnection.define("pagos_renta", {
         type: DataTypes.STRING,
         allowNull: true
     },
-
-    fecha_registro: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
-})
+},
+    {
+        timestamps: true,
+        createdAt: "fechaRegistro",
+        updatedAt: false,
+        freezeTableName: true,
+        paranoid: true
+    }
+)

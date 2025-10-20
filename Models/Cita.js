@@ -1,26 +1,38 @@
-import { Sequelize, DataTypes, DATE } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 import databaseConnection from "../Config/connection";
 
-export const Cita = databaseConnection.define("cita", {
-    id_cita: {
+export const Cita = databaseConnection.define("citas", {
+    idCita: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
 
-    id_propiedad: {
+    idPropiedad: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+            model: "propiedades",
+            key: "idPropiedad"
+        }
     },
 
-    id_usuario: {
+    idUsuario: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+            model: "usuarios",
+            key: "idUsuario"
+        }
     },
 
-    id_responsable: {
+    idResponsable: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+            model: "usuarios",
+            key: "idUsuario"
+        }
     },
 
     fecha: {
@@ -32,9 +44,12 @@ export const Cita = databaseConnection.define("cita", {
         type: DataTypes.ENUM('en_proceso', 'cancelada', 'completada'),
         allowNull: false
     },
-
-    fecha_creacion: {
-        type: DataTypes.DATE,
-        allowNull: false
+},
+    {
+        timestamps: true,
+        createdAt: "fechaCreacion",
+        updatedAt: false,
+        freezeTableName: true,
+        paranoid: true
     }
-})
+)
