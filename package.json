@@ -7,6 +7,8 @@
   "type": "module",
   "main": "App.js",
   "scripts": {
+    "start": "node App.js",
+    "dev": "nodemon App.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -16,9 +18,20 @@
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
-    "nodemon": "^3.1.10",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AmiiGood/estateHub_backend.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/AmiiGood/estateHub_backend/issues"
+  },
+  "homepage": "https://github.com/AmiiGood/estateHub_backend#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

@@ -4,6 +4,7 @@ import pool from "../Config/connection.js";
 import start_router from "../Routes/startRoutes.js";
 import geocodificadorRoutes from "../Routes/geocodificadorRoutes.js";
 import propiedadesRouter from "../Routes/propiedadesRoutes.js";
+import notificacionesRouter from "../Routes/notificacionesRoutes.js";
 
 export class Server {
   constructor() {
@@ -32,6 +33,7 @@ export class Server {
     this.app.use("/api/start", start_router);
     this.app.use("/api/geocodificador", geocodificadorRoutes);
     this.app.use("/api/propiedades", propiedadesRouter);
+    this.app.use("/api/notificaciones", notificacionesRouter);
   }
 
   startServer() {
