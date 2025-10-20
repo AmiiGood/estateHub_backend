@@ -1,6 +1,6 @@
-import databaseConnection from "../Config/connection";
+import databaseConnection from "../Config/connection.js";
 
-const { Sequelize, DataTypes } = require("sequelize");
+import { Sequelize, DataTypes } from "sequelize";
 
 export const GastosMantenimiento = databaseConnection.define(
   "gastos_mantenimiento",
@@ -13,10 +13,6 @@ export const GastosMantenimiento = databaseConnection.define(
     idPropiedad: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "propiedad",
-        key: "idPropiedad",
-      },
     },
     categoria: {
       type: DataTypes.STRING,
@@ -52,6 +48,5 @@ export const GastosMantenimiento = databaseConnection.define(
     createdAt: "fechaGasto",
     updatedAt: false,
     freezeTableName: true,
-    paranoid: true,
   }
 );

@@ -1,7 +1,7 @@
-import { Contrato } from "./Contrato";
-import { GastosMantenimiento } from "./GastosMantenimiento";
-import { Propiedad } from "./Propiedad";
-import { Usuario } from "./Usuario";
+import { Contrato } from "./Contrato.js";
+import { GastosMantenimiento } from "./GastosMantenimiento.js";
+import { Propiedad } from "./Propiedad.js";
+import { Usuario } from "./Usuario.js";
 
 Propiedad.hasMany(Contrato, {
   foreignKey: "idPropiedad",
@@ -20,7 +20,7 @@ Usuario.hasMany(Contrato, {
 
 Contrato.belongsTo(Usuario, {
   foreignKey: "idUsuario",
-  as: "usuario",
+  as: "usuarios",
 });
 
 Usuario.hasMany(Propiedad, {
@@ -30,7 +30,7 @@ Usuario.hasMany(Propiedad, {
 
 Propiedad.belongsTo(Usuario, {
   foreignKey: "idUsuario",
-  as: "usuario",
+  as: "usuarios",
 });
 
 Propiedad.hasMany(GastosMantenimiento, {

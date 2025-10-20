@@ -14,7 +14,7 @@ export const Propiedad = databaseConnection.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "usuario",
+        model: "usuarios",
         key: "idUsuario",
       },
     },

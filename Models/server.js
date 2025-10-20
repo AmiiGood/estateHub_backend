@@ -5,11 +5,20 @@ import start_router from "../Routes/startRoutes.js";
 import geocodificadorRoutes from "../Routes/geocodificadorRoutes.js";
 import propiedadesRouter from "../Routes/propiedadesRoutes.js";
 import usuariosRouter from "../Routes/usuariosRoutes.js";
+import { Sequelize } from "sequelize";
+import databaseConnection from "../Config/connection.js";
+import "../Models/Asociaciones.js";
+import { Usuario } from "./Usuario.js";
+import { Propiedad } from "./Propiedad.js";
+import { Contrato } from "../Models/Asociaciones.js";
+import { Cita } from "./Cita.js";
+import { GastosMantenimiento } from "./GastosMantenimiento.js";
+import { PagoRenta } from "./Pago_renta.js";
 
 export class Server {
   constructor() {
     this.app = express();
-    this.port = 5050;
+    this.port = 3000;
     this.connection();
     this.middlewares();
     this.routes();
@@ -22,7 +31,13 @@ export class Server {
 
   async connection() {
     try {
-      await pool;
+      await databaseConnection.authenticate();
+      await Usuario.sync();
+      await Propiedad.sync();
+      await Contrato.sync();
+      await PagoRenta.sync();
+      await GastosMantenimiento.sync();
+      await Cita.sync();
       console.log("Conectado");
     } catch (e) {
       console.log(e);
