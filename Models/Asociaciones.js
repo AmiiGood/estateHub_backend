@@ -3,23 +3,33 @@ import { Propiedad } from "./Propiedad";
 import { Usuario } from "./Usuario";
 
 Propiedad.hasMany(Contrato, {
-    foreignKey: "idPropiedad",
-    as: "contratos"
-})
+  foreignKey: "idPropiedad",
+  as: "contratos",
+});
 
 Contrato.belongsTo(Propiedad, {
-    foreignKey: "idPropiedad",
-    as: "propiedad"
-})
+  foreignKey: "idPropiedad",
+  as: "propiedad",
+});
 
 Usuario.hasMany(Contrato, {
-    foreignKey: "idUsuario",
-    as: "contratos"
-})
+  foreignKey: "idUsuario",
+  as: "contratos",
+});
 
 Contrato.belongsTo(Usuario, {
-    foreignKey: "idUsuario",
-    as: "usuario"
-})
+  foreignKey: "idUsuario",
+  as: "usuario",
+});
 
-export { Contrato, Propiedad, Usuario }
+Usuario.hasMany(Propiedad, {
+  foreignKey: "idUsuario",
+  as: "propiedades",
+});
+
+Propiedad.belongsTo(Usuario, {
+  foreignKey: "idUsuario",
+  as: "usuario",
+});
+
+export { Contrato, Propiedad, Usuario };

@@ -2,7 +2,7 @@ import databaseConnection from "../Config/connection";
 
 const { Sequelize, DataTypes } = require("sequelize");
 
-export const Gastos_mantenimiento = databaseConnection.define(
+export const GastosMantenimiento = databaseConnection.define(
   "gastos_mantenimiento",
   {
     idGasto: {
