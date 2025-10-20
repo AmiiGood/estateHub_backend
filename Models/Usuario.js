@@ -6,14 +6,14 @@ export const Usuario = databaseConnection.define("usuarios", {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: "id_usuario"
+    field: "idUsuario"
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 
-  password_hash: {
+  passwordHash: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -21,11 +21,11 @@ export const Usuario = databaseConnection.define("usuarios", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  apellido_paterno: {
+  apellidoPaterno: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  apellido_materno: {
+  apellidoMaterno: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -33,11 +33,11 @@ export const Usuario = databaseConnection.define("usuarios", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  tipo_usuario: {
+  tipoUsuario: {
     type: DataTypes.ENUM('arrendatario','propiertario'),
     allowNull: false,
   },
-  fecha_registro: {
+  fechaRegistro: {
     type: DataTypes.DATE,
     allowNull: false,
   },
