@@ -42,5 +42,12 @@ export const Gastos_mantenimiento = databaseConnection.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+  },
+  {
+    timestamps: true,
+    createdAt: "fechaGasto",
+    updatedAt: false,
+    freezeTableName: true,
+    paranoid: true,
   }
 );

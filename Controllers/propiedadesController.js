@@ -1,3 +1,4 @@
+import { where } from "sequelize";
 import { Propiedad } from "../Models/Propiedad.js";
 
 export const registrarPropiedad = async (req, res) => {
@@ -37,12 +38,92 @@ export const registrarPropiedad = async (req, res) => {
     });
 
     return res.status(200).send({
+      succes: true,
       message: "Propiedad registrada",
     });
   } catch (e) {
     console.log(e);
     return res.status(500).send({
-      message: "Error al registrar propiedad",
+      success: false,
+      data: "Error al registrar propiedade",
+      error: e.message,
+    });
+  }
+};
+
+export const updatePropiedad = async (req, res) => {
+  const { propiedad } = req.body;
+
+  try {
+    const findPropiedad = await Propiedad.findByPk(propiedad.idPropiedad);
+
+    const updatedPropiedad = await findPropiedad.update({ propiedad });
+
+    return res.status(200).send({
+      success: true,
+      message: "Propiedad actualizada",
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      data: "Error al editar propiedades",
+      error: e.message,
+    });
+  }
+};
+
+export const obtenerPropiedad = async (req, res) => {
+  try {
+    const propiedades = await Propiedad.findAll();
+
+    return res.status(200).json({
+      success: true,
+      data: propiedades,
+      count: propiedades.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      data: "Error al obtener propiedades",
+      error: e.message,
+    });
+  }
+};
+
+export const eliminarPropiedad = async (req, res) => {
+  const { idPropiedad } = req.params;
+  try {
+    const findPropiedad = await Propiedad.findByPk(idPropiedad);
+
+    const deletedPropiedad = await findPropiedad.destroy();
+
+    return res.send(200).send({
+      success: true,
+      message: "Propiedad eliminada",
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      data: "Error al eliminar propiedades",
+      error: e.message,
+    });
+  }
+};
+
+export const publicarEcommerce = async (req, res) => {
+  const { idPropiedad } = req.params;
+  try {
+    const findPropiedad = await Propiedad.findByPk(idPropiedad);
+
+    const pulicatedPropiedad = await Propiedad.update(
+      { publicado_ecommerce: true },
+      (where = { idPropiedad: idPropiedad })
+    );
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      data: "Error al publicar en ecommerce",
+      error: e.message,
     });
   }
 };
