@@ -1,39 +1,48 @@
-import { Sequelize, DataTypes, DATE } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 import databaseConnection from "../Config/connection";
 
-export const Contrato = databaseConnection.define("contrato", {
-    id_contrato: {
+export const Contrato = databaseConnection.define("contratos", {
+    idContrato: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
 
-    id_propiedad: {
+    idPropiedad: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            //Nombre de la tabla
+            model: "propiedades",
+            key: "idPropiedad"
+        }
     },
 
-    id_usuario: {
+    idUsuario: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+            model: "usuarios",
+            key: "idUsuario"
+        }
     },
 
-    url_doc: {
+    urlDoc: {
         type: DataTypes.STRING,
         allowNull: false
     },
 
-    fecha_inicio: {
+    fechaInicio: {
         type: DataTypes.DATE,
         allowNull: false
     },
 
-    fecha_fin: {
+    fechaFin: {
         type: DataTypes.DATE,
         allowNull: false
     },
 
-    monto_mensual: {
+    montoMensual: {
         type: DataTypes.DOUBLE,
         allowNull: false
     },
@@ -46,9 +55,15 @@ export const Contrato = databaseConnection.define("contrato", {
     estatus: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+        defaultValue: true
     },
-    fech_creacion: {
-        type: DataTypes.DATE,
-        allowNull: false
+},
+    {
+        //Esto crea automaticamente createdAt y updatedAt
+        timestamps: true,
+        createdAt: "fechaCreacion",
+        updatedAt: false,
+        //Forzar nombre con el que se declara
+        freezeTableName: true
     }
-})
+)
