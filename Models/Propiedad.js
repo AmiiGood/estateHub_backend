@@ -13,6 +13,10 @@ export const Propiedad = databaseConnection.define(
     idUsuario: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "usuario",
+        key: "idUsuario",
+      },
     },
 
     titulo: {

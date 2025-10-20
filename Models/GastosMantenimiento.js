@@ -13,6 +13,10 @@ export const GastosMantenimiento = databaseConnection.define(
     idPropiedad: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "propiedad",
+        key: "idPropiedad",
+      },
     },
     categoria: {
       type: DataTypes.STRING,
