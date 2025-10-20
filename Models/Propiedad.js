@@ -48,12 +48,12 @@ export const Propiedad = databaseConnection.define("propiedad", {
     allowNull: false,
   },
 
-  codigo_postal: {
+  codigoPostal: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 
-  tipo_propiedad: {
+  tipoPropiedad: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -62,31 +62,31 @@ export const Propiedad = databaseConnection.define("propiedad", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  precio_venta: {
+  precioVenta: {
     type: DataTypes.DOUBLE,
     allowNull: false,
   },
 
-  precio_renta: {
+  precioRenta: {
     type: DataTypes.DOUBLE,
     allowNull: false,
   },
 
-  num_habitaciones: {
+  numHabitaciones: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  num_banios: {
+  numBanios: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
 
-  metros_cuadrados: {
+  metrosCuadrados: {
     type: DataTypes.DOUBLE,
     allowNull: false,
   },
 
-  num_estacionamiento: {
+  numEstacionamiento: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -114,7 +114,7 @@ export const Propiedad = databaseConnection.define("propiedad", {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  cuarto_servicio: {
+  cuartoServicio: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
@@ -127,11 +127,11 @@ export const Propiedad = databaseConnection.define("propiedad", {
     allowNull: false,
   },
 
-  fecha_registro: {
+  fechaRegistro: {
     type: DataTypes.DATE,
     allowNull: false,
   },
-  publicado_ecommerce: {
+  publicadoEcommerce: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
