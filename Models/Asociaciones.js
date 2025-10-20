@@ -1,9 +1,10 @@
 import { Contrato } from "./Contrato";
 import { Propiedad } from "./Propiedad";
+import { Usuario } from "./Usuario";
 
 Propiedad.hasMany(Contrato, {
     foreignKey: "idPropiedad",
-    as: "contrato"
+    as: "contratos"
 })
 
 Contrato.belongsTo(Propiedad, {
@@ -11,3 +12,14 @@ Contrato.belongsTo(Propiedad, {
     as: "propiedad"
 })
 
+Usuario.hasMany(Contrato, {
+    foreignKey: "idUsuario",
+    as: "contratos"
+})
+
+Contrato.belongsTo(Usuario, {
+    foreignKey: "idUsuario",
+    as: "usuario"
+})
+
+export { Contrato, Propiedad, Usuario }

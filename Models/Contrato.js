@@ -64,6 +64,8 @@ export const Contrato = databaseConnection.define("contratos", {
         createdAt: "fechaCreacion",
         updatedAt: false,
         //Forzar nombre con el que se declara
-        freezeTableName: true
+        freezeTableName: true,
+        //Implementa eliminacion logica
+        paranoid: true
     }
 )
