@@ -7,6 +7,7 @@ import propiedadesRouter from "../Routes/propiedadesRoutes.js";
 import usuariosRouter from "../Routes/usuariosRoutes.js";
 import citasRouter from "../Routes/citasRoutes.js";
 import contratosRouter from "../Routes/contratosRoutes.js";
+import pagosRentaRouter from "../Routes/pagosRentaRoutes.js";
 
 export class Server {
   constructor() {
@@ -38,6 +39,7 @@ export class Server {
     this.app.use("/api/usuarios", usuariosRouter);
     this.app.use("/api/citas", citasRouter);
     this.app.use("/api/contratos", contratosRouter);
+    this.app.use("/api/pagosRenta", pagosRentaRouter);
   }
 
   startServer() {
