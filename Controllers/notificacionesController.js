@@ -6,12 +6,13 @@ export const agregarNotificacion = async (req, res) => {
     try{
         console.log(notificacion);
         const newNotificacion = await Notificacion.create({
-            id_usuario: notificacion.idUsuario,
+            idUsuario: notificacion.idUsuario,
             tipo: notificacion.tipo,
             titulo: notificacion.titulo,
             mensaje: notificacion.mensaje,
             leida: notificacion.leida,
-            fecha_envio: notificacion.fecha_envio,
+            fechaEnvio: notificacion.fechaEnvio,
+            fechaRegistro: notificacion.fechaRegistro,
         });
 
         return res.status(200).send({
@@ -38,15 +39,16 @@ export const editarNotificacion = async (req, res) => {
         }
 
         const result = await Notificacion.update({
-            id_usuario: notificacion.idUsuario,
+            idUsuario: notificacion.idUsuario,
             tipo: notificacion.tipo,
             titulo: notificacion.titulo,
             mensaje: notificacion.mensaje,
             leida: notificacion.leida,
-            fecha_envio: notificacion.fecha_envio,
+            fechaEnvio: notificacion.fechaEnvio,
+            fechaRegistro: notificacion.fechaRegistro,
         }, {
             where: {
-                id_notificacion: idNotificacion 
+                idNotificacion: idNotificacion 
             }
         });
 
@@ -72,7 +74,7 @@ export const editarNotificacion = async (req, res) => {
 export const getAllNotificaciones = async (req, res) => {
     try {
         const notificaciones = await Notificacion.findAll({
-            order: [['fecha_envio', 'DESC']] 
+            order: [['fechaEnvio', 'DESC']] 
         });
 
         return res.status(200).send({
@@ -125,33 +127,29 @@ export const getNotificacion = async (req, res) => {
 export const eliminarNotificacion = async (req, res) => {
   const { idNotificacion } = req.params;
   
-  if (!idNotificacion) {
-    return res.status(400).send({
-      message: "ID de notificación es requerido",
-    });
-  }
-
   try {
-    const notificacion = await Notificacion.findByPk(idNotificacion);
-    
-    if (!notificacion) {
+    const findNotificacion = await Notificacion.findByPk(idNotificacion);
+
+    if (!findNotificacion) {
       return res.status(404).send({
+        success: false,
         message: "Notificación no encontrada",
       });
     }
 
-    await notificacion.destroy();
+    const deletedNotificacion = await findNotificacion.destroy();
 
-    return res.status(200).json({
+    return res.status(200).send({
       success: true,
       message: "Notificación eliminada correctamente",
     });
     
   } catch (error) {
     console.error("Error al eliminar notificación:", error);
-    return res.status(500).json({
+    return res.status(500).send({
       success: false,
       message: "Error al eliminar la notificación",
+      error: error.message,
     });
   }
 };

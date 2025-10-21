@@ -2,15 +2,19 @@ import { Sequelize, DataTypes } from "sequelize";
 import databaseConnection from "../Config/connection.js";
 
 export const Notificacion = databaseConnection.define("notificaciones", {
-  id_notificacion: {
+  idNotificacion: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
 
-  id_usuario: {
+  idUsuario: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    references: {
+      model: "usuarios",
+      key: "idUsuario"
+    }
   },
 
   tipo: {
@@ -33,11 +37,15 @@ export const Notificacion = databaseConnection.define("notificaciones", {
     allowNull: false,
   },
 
-  fecha_envio: {
+  fechaEnvio: {
     type: DataTypes.DATE,
     allowNull: false,
   },
 },{
   tableName: 'notificaciones',
-  timestamps: false
+  timestamps: true,
+  createdAt: "fechaRegistro",
+  updatedAt: false,
+  freezeTableName: true,
+  paranoid: true
 });
