@@ -1,4 +1,4 @@
-import { Cita, Usuario, Propiedad } from "../Models/Asociaciones";
+import { Cita, Usuario, Propiedad } from "../Models/Asociaciones.js";
 
 export const citaController = {
   // Obtener todas las citas

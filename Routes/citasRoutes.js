@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { citaController } from "../Controllers/citasController";
+import { citaController } from "../Controllers/citasController.js";
 
 const router = Router();
 

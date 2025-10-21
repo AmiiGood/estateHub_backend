@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes } from "sequelize";
-import databaseConnection from "../Config/connection";
+import databaseConnection from "../Config/connection.js";
 
 export const Contrato = databaseConnection.define("contratos", {
     idContrato: {
