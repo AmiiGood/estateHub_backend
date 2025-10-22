@@ -5,6 +5,9 @@ import start_router from "../Routes/startRoutes.js";
 import geocodificadorRoutes from "../Routes/geocodificadorRoutes.js";
 import propiedadesRouter from "../Routes/propiedadesRoutes.js";
 import usuariosRouter from "../Routes/usuariosRoutes.js";
+import citasRouter from "../Routes/citasRoutes.js";
+import contratosRouter from "../Routes/contratosRoutes.js";
+import pagosRentaRouter from "../Routes/pagosRentaRoutes.js";
 import { Sequelize } from "sequelize";
 import databaseConnection from "../Config/connection.js";
 import "../Models/Asociaciones.js";
@@ -49,6 +52,9 @@ export class Server {
     this.app.use("/api/geocodificador", geocodificadorRoutes);
     this.app.use("/api/propiedades", propiedadesRouter);
     this.app.use("/api/usuarios", usuariosRouter);
+    this.app.use("/api/citas", citasRouter);
+    this.app.use("/api/contratos", contratosRouter);
+    this.app.use("/api/pagosRenta", pagosRentaRouter);
   }
 
   startServer() {
