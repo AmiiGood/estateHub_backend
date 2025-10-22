@@ -4,6 +4,7 @@ import pool from "../Config/connection.js";
 import start_router from "../Routes/startRoutes.js";
 import geocodificadorRoutes from "../Routes/geocodificadorRoutes.js";
 import propiedadesRouter from "../Routes/propiedadesRoutes.js";
+import notificacionesRouter from "../Routes/notificacionesRoutes.js";
 import usuariosRouter from "../Routes/usuariosRoutes.js";
 import citasRouter from "../Routes/citasRoutes.js";
 import contratosRouter from "../Routes/contratosRoutes.js";
@@ -51,6 +52,7 @@ export class Server {
     this.app.use("/api/start", start_router);
     this.app.use("/api/geocodificador", geocodificadorRoutes);
     this.app.use("/api/propiedades", propiedadesRouter);
+    this.app.use("/api/notificaciones", notificacionesRouter);
     this.app.use("/api/usuarios", usuariosRouter);
     this.app.use("/api/citas", citasRouter);
     this.app.use("/api/contratos", contratosRouter);
