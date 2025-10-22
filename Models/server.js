@@ -17,7 +17,8 @@ import { Propiedad } from "./Propiedad.js";
 import { Contrato } from "../Models/Asociaciones.js";
 import { Cita } from "./Cita.js";
 import { GastosMantenimiento } from "./GastosMantenimiento.js";
-import { PagoRenta } from "./Pago_renta.js";
+import { PagoRenta } from "./PagoRenta.js";
+import { Notificacion } from "./Notificacion.js";
 
 export class Server {
   constructor() {
@@ -42,6 +43,7 @@ export class Server {
       await PagoRenta.sync();
       await GastosMantenimiento.sync();
       await Cita.sync();
+      await Notificacion.sync();
       console.log("Conectado");
     } catch (e) {
       console.log(e);

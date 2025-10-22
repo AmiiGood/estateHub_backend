@@ -1,9 +1,9 @@
-import { Contrato } from "./Contrato.js.js";
+import { Contrato } from "./Contrato.js";
 import { GastosMantenimiento } from "./GastosMantenimiento.js";
-import { Propiedad } from "./Propiedad.js.js";
+import { Propiedad } from "./Propiedad.js";
 import { Usuario } from "./Usuario.js";
 import { Cita } from "./Cita.js";
-import { PagoRenta } from "./PagoRenta.js.js";
+import { PagoRenta } from "./PagoRenta.js";
 
 Propiedad.hasMany(Contrato, {
   foreignKey: "idPropiedad",
