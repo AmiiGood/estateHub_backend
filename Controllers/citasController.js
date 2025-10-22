@@ -1,263 +1,257 @@
 import { Cita, Usuario, Propiedad } from "../Models/Asociaciones.js";
 
-export const citaController = {
-  // Obtener todas las citas
-  obtenerTodas: async (req, res) => {
-    try {
-      const citas = await Cita.findAll({
-        include: [
-          {
-            model: Propiedad,
-            as: "propiedad",
-          },
-          {
-            model: Usuario,
-            as: "usuario",
-          },
-          {
-            model: Usuario,
-            as: "responsable",
-          },
-        ],
-      });
-      res.status(200).json(citas);
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al obtener las citas",
-        error,
+export const registrarCita = async (req, res) => {
+  const { cita } = req.body;
+  try {
+    // Validar que existan los registros relacionados
+    const propiedad = await Propiedad.findByPk(cita.idPropiedad);
+    if (!propiedad) {
+      return res.status(404).send({
+        success: false,
+        message: "Propiedad no encontrada",
       });
     }
-  },
 
-  // Obtener una cita por ID
-  obtenerPorId: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const cita = await Cita.findByPk(id, {
-        include: [
-          {
-            model: Propiedad,
-            as: "propiedad",
-          },
-          {
-            model: Usuario,
-            as: "usuario",
-          },
-          {
-            model: Usuario,
-            as: "responsable",
-          },
-        ],
-      });
-
-      if (!cita) {
-        return res.status(404).json({
-          mensaje: "Cita no encontrada",
-        });
-      }
-
-      res.status(200).json(cita);
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al obtener la cita",
-        error,
+    const usuario = await Usuario.findByPk(cita.idUsuario);
+    if (!usuario) {
+      return res.status(404).send({
+        success: false,
+        message: "Usuario no encontrado",
       });
     }
-  },
 
-  // Crear una nueva cita
-  crear: async (req, res) => {
-    try {
-      const { idPropiedad, idUsuario, idResponsable, fecha, estatus } =
-        req.body;
-
-      // Validar que existan los registros relacionados
-      const propiedad = await Propiedad.findByPk(idPropiedad);
-      if (!propiedad) {
-        return res.status(404).json({
-          mensaje: "Propiedad no encontrada",
-        });
-      }
-
-      const usuario = await Usuario.findByPk(idUsuario);
-      if (!usuario) {
-        return res.status(404).json({
-          mensaje: "Usuario no encontrado",
-        });
-      }
-
-      const responsable = await Usuario.findByPk(idResponsable);
-      if (!responsable) {
-        return res.status(404).json({
-          mensaje: "Responsable no encontrado",
-        });
-      }
-
-      const nuevaCita = await Cita.create({
-        idPropiedad,
-        idUsuario,
-        idResponsable,
-        fecha,
-        estatus,
-      });
-
-      // Obtener la cita con las relaciones
-      const citaCompleta = await Cita.findByPk(nuevaCita.idCita, {
-        include: [
-          { model: Propiedad, as: "propiedad" },
-          { model: Usuario, as: "usuario" },
-          { model: Usuario, as: "responsable" },
-        ],
-      });
-
-      res.status(201).json({
-        mensaje: "Cita creada exitosamente",
-        cita: citaCompleta,
-      });
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al crear la cita",
-        error,
+    const responsable = await Usuario.findByPk(cita.idResponsable);
+    if (!responsable) {
+      return res.status(404).send({
+        success: false,
+        message: "Responsable no encontrado",
       });
     }
-  },
 
-  // Actualizar una cita
-  actualizar: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { idPropiedad, idUsuario, idResponsable, fecha, estatus } =
-        req.body;
+    const nuevaCita = await Cita.create({
+      idPropiedad: cita.idPropiedad,
+      idUsuario: cita.idUsuario,
+      idResponsable: cita.idResponsable,
+      fecha: cita.fecha,
+      estatus: cita.estatus,
+    });
 
-      const cita = await Cita.findByPk(id);
-      if (!cita) {
-        return res.status(404).json({
-          mensaje: "Cita no encontrada",
-        });
-      }
+    return res.status(200).send({
+      success: true,
+      message: "Cita registrada",
+      data: nuevaCita,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      success: false,
+      message: "Error al registrar cita",
+      error: e.message,
+    });
+  }
+};
 
-      await cita.update({
-        idPropiedad,
-        idUsuario,
-        idResponsable,
-        fecha,
-        estatus,
-      });
+export const updateCita = async (req, res) => {
+  const { cita } = req.body;
+  try {
+    const findCita = await Cita.findByPk(cita.idCita);
 
-      // Obtener la cita actualizada con las relaciones
-      const citaActualizada = await Cita.findByPk(id, {
-        include: [
-          { model: Propiedad, as: "propiedad" },
-          { model: Usuario, as: "usuario" },
-          { model: Usuario, as: "responsable" },
-        ],
-      });
-
-      res.status(200).json({
-        mensaje: "Cita actualizada exitosamente",
-        cita: citaActualizada,
-      });
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al actualizar la cita",
-        error,
+    if (!findCita) {
+      return res.status(404).send({
+        success: false,
+        message: "Cita no encontrada",
       });
     }
-  },
 
-  // Eliminar una cita logicamente por el paranoid
-  eliminar: async (req, res) => {
-    try {
-      const { id } = req.params;
+    await findCita.update(cita);
 
-      const cita = await Cita.findByPk(id);
-      if (!cita) {
-        return res.status(404).json({
-          mensaje: "Cita no encontrada",
-        });
-      }
+    return res.status(200).send({
+      success: true,
+      message: "Cita actualizada",
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al actualizar cita",
+      error: e.message,
+    });
+  }
+};
 
-      await cita.destroy();
+export const obtenerCitas = async (req, res) => {
+  try {
+    const citas = await Cita.findAll({
+      include: [
+        {
+          model: Propiedad,
+          as: "propiedad",
+        },
+        {
+          model: Usuario,
+          as: "usuario",
+        },
+        {
+          model: Usuario,
+          as: "responsable",
+        },
+      ],
+    });
 
-      res.status(200).json({
-        mensaje: "Cita eliminada exitosamente",
-      });
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al eliminar la cita",
-        error,
-      });
-    }
-  },
+    return res.status(200).json({
+      success: true,
+      data: citas,
+      count: citas.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener citas",
+      error: e.message,
+    });
+  }
+};
 
-  // Obtener citas por usuario
-  obtenerPorUsuario: async (req, res) => {
-    try {
-      const { idUsuario } = req.params;
+export const obtenerCitaPorId = async (req, res) => {
+  const { idCita } = req.params;
+  try {
+    const cita = await Cita.findByPk(idCita, {
+      include: [
+        {
+          model: Propiedad,
+          as: "propiedad",
+        },
+        {
+          model: Usuario,
+          as: "usuario",
+        },
+        {
+          model: Usuario,
+          as: "responsable",
+        },
+      ],
+    });
 
-      const citas = await Cita.findAll({
-        where: { idUsuario },
-        include: [
-          { model: Propiedad, as: "propiedad" },
-          { model: Usuario, as: "responsable" },
-        ],
-      });
-
-      res.status(200).json(citas);
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al obtener las citas del usuario",
-        error,
-      });
-    }
-  },
-
-  // Obtener citas por responsable
-  obtenerPorResponsable: async (req, res) => {
-    try {
-      const { idResponsable } = req.params;
-
-      const citas = await Cita.findAll({
-        where: { idResponsable },
-        include: [
-          { model: Propiedad, as: "propiedad" },
-          { model: Usuario, as: "usuario" },
-        ],
-      });
-
-      res.status(200).json(citas);
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al obtener las citas del responsable",
-        error,
-      });
-    }
-  },
-
-  // Actualizar estatus de una cita
-  actualizarEstatus: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { estatus } = req.body;
-
-      const cita = await Cita.findByPk(id);
-      if (!cita) {
-        return res.status(404).json({
-          mensaje: "Cita no encontrada",
-        });
-      }
-
-      await cita.update({ estatus });
-
-      res.status(200).json({
-        mensaje: "Estatus actualizado exitosamente",
-        cita,
-      });
-    } catch (error) {
-      res.status(500).json({
-        mensaje: "Error al actualizar el estatus",
-        error,
+    if (!cita) {
+      return res.status(404).send({
+        success: false,
+        message: "Cita no encontrada",
       });
     }
-  },
+
+    return res.status(200).json({
+      success: true,
+      data: cita,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener cita",
+      error: e.message,
+    });
+  }
+};
+
+export const eliminarCita = async (req, res) => {
+  const { idCita } = req.params;
+  try {
+    const findCita = await Cita.findByPk(idCita);
+
+    if (!findCita) {
+      return res.status(404).send({
+        success: false,
+        message: "Cita no encontrada",
+      });
+    }
+
+    await findCita.destroy();
+
+    return res.status(200).send({
+      success: true,
+      message: "Cita eliminada",
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al eliminar cita",
+      error: e.message,
+    });
+  }
+};
+
+export const obtenerCitasPorUsuario = async (req, res) => {
+  const { idUsuario } = req.params;
+  try {
+    const citas = await Cita.findAll({
+      where: { idUsuario },
+      include: [
+        { model: Propiedad, as: "propiedad" },
+        { model: Usuario, as: "responsable" },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: citas,
+      count: citas.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener citas del usuario",
+      error: e.message,
+    });
+  }
+};
+
+export const obtenerCitasPorResponsable = async (req, res) => {
+  const { idResponsable } = req.params;
+  try {
+    const citas = await Cita.findAll({
+      where: { idResponsable },
+      include: [
+        { model: Propiedad, as: "propiedad" },
+        { model: Usuario, as: "usuario" },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: citas,
+      count: citas.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener citas del responsable",
+      error: e.message,
+    });
+  }
+};
+
+export const actualizarEstatusCita = async (req, res) => {
+  const { idCita } = req.params;
+  const { estatus } = req.body;
+  try {
+    const findCita = await Cita.findByPk(idCita);
+
+    if (!findCita) {
+      return res.status(404).send({
+        success: false,
+        message: "Cita no encontrada",
+      });
+    }
+
+    await findCita.update({ estatus });
+
+    return res.status(200).send({
+      success: true,
+      message: "Estatus de la cita actualizado",
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al actualizar estatus",
+      error: e.message,
+    });
+  }
 };

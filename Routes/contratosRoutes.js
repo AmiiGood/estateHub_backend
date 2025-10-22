@@ -1,25 +1,26 @@
 import { Router } from "express";
-import { contratoController } from "../Controllers/contratosController.js";
+import {
+  registrarContrato,
+  updateContrato,
+  obtenerContratos,
+  obtenerContratoPorId,
+  eliminarContrato,
+  obtenerContratosPorUsuario,
+  obtenerContratosPorPropiedad,
+  obtenerContratosActivos,
+  actualizarEstatusContrato,
+} from "../Controllers/contratosController.js";
 
-const router = Router();
+const contratosRouter = Router();
 
-// Rutas CRUD
-router.get("/", contratoController.obtenerTodos);
-router.get("/activos", contratoController.obtenerActivos);
-router.get("/:id", contratoController.obtenerPorId);
-router.post("/", contratoController.crear);
-router.put("/:id", contratoController.actualizar);
-router.delete("/:id", contratoController.eliminar);
+contratosRouter.get("/getContratos", obtenerContratos);
+contratosRouter.get("/getContratosActivos", obtenerContratosActivos);
+contratosRouter.get("/getContrato/:idContrato", obtenerContratoPorId);
+contratosRouter.get("/getContratosByUsuario/:idUsuario", obtenerContratosPorUsuario);
+contratosRouter.get("/getContratosByPropiedad/:idPropiedad", obtenerContratosPorPropiedad);
+contratosRouter.post("/postContrato", registrarContrato);
+contratosRouter.put("/putContrato", updateContrato);
+contratosRouter.put("/putEstatusContrato/:idContrato", actualizarEstatusContrato);
+contratosRouter.delete("/deleteContrato/:idContrato", eliminarContrato);
 
-// Rutas extra
-router.get(
-  "/usuario/:idUsuario",
-  contratoController.obtenerPorUsuario
-);
-router.get(
-  "/propiedad/:idPropiedad",
-  contratoController.obtenerPorPropiedad
-);
-router.patch("/:id/estatus", contratoController.actualizarEstatus);
-
-export default router;
+export default contratosRouter;

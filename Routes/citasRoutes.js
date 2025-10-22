@@ -1,18 +1,24 @@
 import { Router } from "express";
-import { citaController } from "../Controllers/citasController.js";
+import {
+    registrarCita,
+    updateCita,
+    obtenerCitas,
+    obtenerCitaPorId,
+    eliminarCita,
+    obtenerCitasPorUsuario,
+    obtenerCitasPorResponsable,
+    actualizarEstatusCita,
+} from "../Controllers/citasController.js";
 
-const router = Router();
+const citasRouter = Router();
 
-// Rutas CRUD
-router.get("/", citaController.obtenerTodas);
-router.get("/:id", citaController.obtenerPorId);
-router.post("/", citaController.crear);
-router.put("/:id", citaController.actualizar);
-router.delete("/:id", citaController.eliminar);
+citasRouter.get("/getCitas", obtenerCitas);
+citasRouter.get("/getCita/:idCita", obtenerCitaPorId);
+citasRouter.get("/getCitasByUsuario/:idUsuario", obtenerCitasPorUsuario);
+citasRouter.get("/getCitasByResponsable/:idResponsable", obtenerCitasPorResponsable);
+citasRouter.post("/postCita", registrarCita);
+citasRouter.put("/putCita", updateCita);
+citasRouter.put("/putEstatusCita/:idCita", actualizarEstatusCita);
+citasRouter.delete("/deleteCita/:idCita", eliminarCita);
 
-// Rutas extra
-router.get("/usuario/:idUsuario", citaController.obtenerPorUsuario);
-router.get("/responsable/:idResponsable", citaController.obtenerPorResponsable);
-router.patch("/:id/estatus", citaController.actualizarEstatus);
-
-export default router;
+export default citasRouter;

@@ -1,18 +1,24 @@
 import { Router } from "express";
-import { pagosRentaController } from "../Controllers/pagosRentaController.js";
+import {
+    registrarPagoRenta,
+    updatePagoRenta,
+    obtenerPagosRenta,
+    obtenerPagoRentaPorId,
+    eliminarPagoRenta,
+    obtenerPagosRentaPorContrato,
+    obtenerPagosRentaPorEstatus,
+    obtenerPagosRentaPorRangoFechas,
+} from "../Controllers/pagosRentaController.js";
 
-const router = Router();
+const pagosRentaRouter = Router();
 
-// Rutas CRUD
-router.get("/", pagosRentaController.obtenerTodos);
-router.get("/:id", pagosRentaController.obtenerPorId);
-router.post("/", pagosRentaController.crear);
-router.put("/:id", pagosRentaController.actualizar);
-router.delete("/:id", pagosRentaController.eliminar);
+pagosRentaRouter.get("/getPagosRenta", obtenerPagosRenta);
+pagosRentaRouter.get("/getPagoRenta/:idPago", obtenerPagoRentaPorId);
+pagosRentaRouter.get("/getPagosRentaByContrato/:idContrato", obtenerPagosRentaPorContrato);
+pagosRentaRouter.get("/getPagosRentaByEstatus/:estatus", obtenerPagosRentaPorEstatus);
+pagosRentaRouter.get("/getPagosRentaByRangoFechas", obtenerPagosRentaPorRangoFechas);
+pagosRentaRouter.post("/postPagoRenta", registrarPagoRenta);
+pagosRentaRouter.put("/putPagoRenta", updatePagoRenta);
+pagosRentaRouter.delete("/deletePagoRenta/:idPago", eliminarPagoRenta);
 
-// Rutas extra
-router.get("/contrato/:idContrato", pagosRentaController.obtenerPorContrato);
-router.get("/estatus/:estatus", pagosRentaController.obtenerPorEstatus);
-router.get("/filtro/fechas", pagosRentaController.obtenerPorRangoFechas);
-
-export default router;
+export default pagosRentaRouter;
