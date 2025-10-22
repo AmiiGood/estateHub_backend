@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 export const getAllUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll({
-      attributes: { exclude: ['password_hash'] },
+      attributes: { exclude: ['passwordHash'] },
     });
     
     return res.status(200).json({
@@ -62,13 +62,13 @@ export const registrarUsuario = async (req, res) => {
     console.log(usuario);
     const newUsuario = await Usuario.create({
       email: usuario.email,
-      password_hash: passwordHash,
+      passwordHash: passwordHash,
       nombre: usuario.nombre,
-      apellido_paterno: usuario.apellido_paterno,
-      apellido_materno: usuario.apellido_materno,
+      apellidoPaterno: usuario.apellidoPaterno,
+      apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
-      tipo_usuario: usuario.tipo_usuario,
-      fecha_registro: usuario.fecha_registro,
+      tipoUsuario: usuario.tipoUsuario,
+      fechaRegistro: usuario.fechaRegistro,
       activo: usuario.activo,
     });
 
@@ -97,7 +97,7 @@ export const editarUsuario = async (req, res) => {
 
     
     
-    let passwordHash = user.password_hash;
+    let passwordHash = user.passwordHash;
     if (usuario.password && usuario.password.trim() !== "") {
       const saltRounds = 10;
       passwordHash = await bcrypt.hash(usuario.password, saltRounds);
@@ -106,12 +106,12 @@ export const editarUsuario = async (req, res) => {
   try {
     await user.update({
       email: usuario.email,
-      password_hash: passwordHash,  
+      passwordHash: passwordHash,  
       nombre: usuario.nombre,
-      apellido_paterno: usuario.apellido_paterno,
-      apellido_materno: usuario.apellido_materno,
+      apellidoPaterno: usuario.apellidoPaterno,
+      apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
-      tipo_usuario: usuario.tipo_usuario,
+      tipoUsuario: usuario.tipoUsuario,
       activo: usuario.activo,
     });
     return res.status(200).send({
