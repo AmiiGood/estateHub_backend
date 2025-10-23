@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   eliminarPropiedad,
   obtenerPropiedad,
+  obtenerPropiedades,
   publicarEcommerce,
   registrarPropiedad,
   updatePropiedad,
@@ -9,7 +10,8 @@ import {
 
 const propiedadesRouter = Router();
 
-propiedadesRouter.get("/getPropiedad", obtenerPropiedad);
+propiedadesRouter.get("/getPropiedades", obtenerPropiedades);
+propiedadesRouter.get("/getPropiedad/:idPropiedad", obtenerPropiedad);
 propiedadesRouter.post("/postPropiedad", registrarPropiedad);
 propiedadesRouter.put("/putPropiedad", updatePropiedad);
 propiedadesRouter.delete("/deletePropiedad/:idPropiedad", eliminarPropiedad);
