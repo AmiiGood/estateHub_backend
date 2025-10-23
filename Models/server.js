@@ -14,6 +14,7 @@ import { Contrato } from "../Models/Asociaciones.js";
 import { Cita } from "./Cita.js";
 import { GastosMantenimiento } from "./GastosMantenimiento.js";
 import { PagoRenta } from "./Pago_renta.js";
+import gastosMantenimientoRouter from "../Routes/GastosMantenimientoRoutes.js";
 
 export class Server {
   constructor() {
@@ -49,6 +50,7 @@ export class Server {
     this.app.use("/api/geocodificador", geocodificadorRoutes);
     this.app.use("/api/propiedades", propiedadesRouter);
     this.app.use("/api/usuarios", usuariosRouter);
+    this.app.use("/api/gastosMantenimiento", gastosMantenimientoRouter);
   }
 
   startServer() {
