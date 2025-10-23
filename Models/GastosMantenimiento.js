@@ -47,6 +47,8 @@ export const GastosMantenimiento = databaseConnection.define(
     timestamps: true,
     createdAt: "fechaGasto",
     updatedAt: false,
+    deletedAt: true,
     freezeTableName: true,
+    paranoid: true,
   }
 );
