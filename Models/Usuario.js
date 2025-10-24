@@ -46,6 +46,9 @@ export const Usuario = databaseConnection.define("usuarios", {
     allowNull: false,
   },
 },{
-    tableName: "usuarios",
-    timestamps: false,
+    timestamps: true,
+    createdAt: 'fechaRegistro',
+    updatedAt: false,
+    freezeTableName: true,
+    paranoid: true
   });
