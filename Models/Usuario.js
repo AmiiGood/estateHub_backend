@@ -46,10 +46,13 @@ export const Usuario = databaseConnection.define(
     activo: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: true,
     },
   },
   {
-    tableName: "usuarios",
-    timestamps: false,
-  }
-);
+    timestamps: true,
+    createdAt: 'fechaRegistro',
+    updatedAt: false,
+    freezeTableName: true,
+    paranoid: false,
+  });
