@@ -4,28 +4,25 @@ import e from "cors";
 export const agregarNotificacion = async (req, res) => {
     const { notificacion } = req.body;
     try{
-        console.log(notificacion);
         const newNotificacion = await Notificacion.create({
             idUsuario: notificacion.idUsuario,
             tipo: notificacion.tipo,
             titulo: notificacion.titulo,
             mensaje: notificacion.mensaje,
-            leida: notificacion.leida,
-            fechaEnvio: notificacion.fechaEnvio,
-            fechaRegistro: notificacion.fechaRegistro,
+            leida: notificacion.leida || false, 
         });
 
         return res.status(200).send({
-            message: "Notificacion agregada",
+            message: "Notificación agregada",
+            data: newNotificacion
         });
     } catch (e){
         console.log(e);
         return res.status(500).send({
-            message: "Error al agregar la notificacion"
+            message: "Error al agregar la notificación"
         })
     }
 };
-
 
 export const editarNotificacion = async (req, res) => {
     const { idNotificacion } = req.params;
@@ -44,8 +41,6 @@ export const editarNotificacion = async (req, res) => {
             titulo: notificacion.titulo,
             mensaje: notificacion.mensaje,
             leida: notificacion.leida,
-            fechaEnvio: notificacion.fechaEnvio,
-            fechaRegistro: notificacion.fechaRegistro,
         }, {
             where: {
                 idNotificacion: idNotificacion 
