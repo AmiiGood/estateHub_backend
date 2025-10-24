@@ -22,7 +22,7 @@ Usuario.hasMany(Contrato, {
 
 Contrato.belongsTo(Usuario, {
   foreignKey: "idUsuario",
-  as: "usuarios",
+  as: "usuario",
 });
 
 Usuario.hasMany(Propiedad, {
@@ -32,7 +32,7 @@ Usuario.hasMany(Propiedad, {
 
 Propiedad.belongsTo(Usuario, {
   foreignKey: "idUsuario",
-  as: "usuarios",
+  as: "usuario",
 });
 
 Propiedad.hasMany(GastosMantenimiento, {
@@ -60,19 +60,9 @@ Cita.belongsTo(Usuario, {
   as: "usuario",
 });
 
-Cita.belongsTo(Usuario, {
-  foreignKey: "idResponsable",
-  as: "responsable",
-});
-
 Usuario.hasMany(Cita, {
   foreignKey: "idUsuario",
   as: "citasAgendadas",
-});
-
-Usuario.hasMany(Cita, {
-  foreignKey: "idResponsable",
-  as: "citasAsignadas",
 });
 
 PagoRenta.belongsTo(Contrato, {

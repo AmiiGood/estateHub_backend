@@ -8,7 +8,6 @@ import {
 export const registrarContrato = async (req, res) => {
   const { contrato } = req.body;
   try {
-    // Validar que existan los registros relacionados
     const propiedad = await Propiedad.findByPk(contrato.idPropiedad);
     if (!propiedad) {
       return res.status(404).send({
@@ -25,7 +24,6 @@ export const registrarContrato = async (req, res) => {
       });
     }
 
-    // Validar fechas
     if (new Date(contrato.fechaFin) <= new Date(contrato.fechaInicio)) {
       return res.status(400).send({
         success: false,
@@ -41,7 +39,6 @@ export const registrarContrato = async (req, res) => {
       fechaFin: contrato.fechaFin,
       montoMensual: contrato.montoMensual,
       deposito: contrato.deposito,
-      estatus: contrato.estatus !== undefined ? contrato.estatus : true,
     });
 
     return res.status(200).send({
@@ -71,7 +68,6 @@ export const updateContrato = async (req, res) => {
       });
     }
 
-    // Validar fechas
     const nuevaFechaInicio = contrato.fechaInicio || findContrato.fechaInicio;
     const nuevaFechaFin = contrato.fechaFin || findContrato.fechaFin;
 

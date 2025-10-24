@@ -1,13 +1,15 @@
 import { Router } from "express";
 import {
-    registrarCita,
-    updateCita,
-    obtenerCitas,
-    obtenerCitaPorId,
-    eliminarCita,
-    obtenerCitasPorUsuario,
-    obtenerCitasPorResponsable,
-    actualizarEstatusCita,
+  crearCita,
+  actualizarCita,
+  obtenerCitas,
+  obtenerCitaPorId,
+  eliminarCita,
+  obtenerCitasPorUsuario,
+  obtenerCitasPorResponsable,
+  obtenerCitasPorEstatus,
+  obtenerCitasPorRangoFechas,
+  obtenerCitasPorPropiedad,
 } from "../Controllers/citasController.js";
 
 const citasRouter = Router();
@@ -15,10 +17,15 @@ const citasRouter = Router();
 citasRouter.get("/getCitas", obtenerCitas);
 citasRouter.get("/getCita/:idCita", obtenerCitaPorId);
 citasRouter.get("/getCitasByUsuario/:idUsuario", obtenerCitasPorUsuario);
-citasRouter.get("/getCitasByResponsable/:idResponsable", obtenerCitasPorResponsable);
-citasRouter.post("/postCita", registrarCita);
-citasRouter.put("/putCita", updateCita);
-citasRouter.put("/putEstatusCita/:idCita", actualizarEstatusCita);
+citasRouter.get(
+  "/getCitasByResponsable/:idUsuario",
+  obtenerCitasPorResponsable
+);
+citasRouter.get("/getCitasByPropiedad/:idPropiedad", obtenerCitasPorPropiedad);
+citasRouter.get("/getCitasByEstatus/:estatus", obtenerCitasPorEstatus);
+citasRouter.get("/getCitasByFechas", obtenerCitasPorRangoFechas);
+citasRouter.post("/postCita", crearCita);
+citasRouter.put("/putCita", actualizarCita);
 citasRouter.delete("/deleteCita/:idCita", eliminarCita);
 
 export default citasRouter;

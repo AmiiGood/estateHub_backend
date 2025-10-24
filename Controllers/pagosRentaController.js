@@ -4,25 +4,11 @@ import { Op } from "sequelize";
 export const registrarPagoRenta = async (req, res) => {
   const { pagoRenta } = req.body;
   try {
-    // Validar contrato existente
     const contrato = await Contrato.findByPk(pagoRenta.idContrato);
     if (!contrato) {
       return res.status(404).send({
         success: false,
         message: "Contrato no encontrado",
-      });
-    }
-
-    // Validar fechas
-    if (
-      pagoRenta.fechaPago &&
-      pagoRenta.fechaVencimiento &&
-      new Date(pagoRenta.fechaPago) < new Date(pagoRenta.fechaVencimiento)
-    ) {
-      return res.status(400).send({
-        success: false,
-        message:
-          "La fecha de pago no puede ser anterior a la fecha de vencimiento",
       });
     }
 
@@ -64,7 +50,6 @@ export const updatePagoRenta = async (req, res) => {
       });
     }
 
-    // Validar contrato si se envía
     if (pagoRenta.idContrato) {
       const contrato = await Contrato.findByPk(pagoRenta.idContrato);
       if (!contrato) {
@@ -73,23 +58,6 @@ export const updatePagoRenta = async (req, res) => {
           message: "Contrato no encontrado",
         });
       }
-    }
-
-    // Validar fechas si ambas están presentes
-    const nuevaFechaPago = pagoRenta.fechaPago || findPago.fechaPago;
-    const nuevaFechaVencimiento =
-      pagoRenta.fechaVencimiento || findPago.fechaVencimiento;
-
-    if (
-      nuevaFechaPago &&
-      nuevaFechaVencimiento &&
-      new Date(nuevaFechaPago) < new Date(nuevaFechaVencimiento)
-    ) {
-      return res.status(400).send({
-        success: false,
-        message:
-          "La fecha de pago no puede ser anterior a la fecha de vencimiento",
-      });
     }
 
     await findPago.update(pagoRenta);

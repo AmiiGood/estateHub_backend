@@ -1,9 +1,9 @@
-import { Cita, Usuario, Propiedad } from "../Models/Asociaciones.js";
+import { Cita, Propiedad, Usuario } from "../Models/Asociaciones.js";
+import { Op } from "sequelize";
 
-export const registrarCita = async (req, res) => {
+export const crearCita = async (req, res) => {
   const { cita } = req.body;
   try {
-    // Validar que existan los registros relacionados
     const propiedad = await Propiedad.findByPk(cita.idPropiedad);
     if (!propiedad) {
       return res.status(404).send({
@@ -20,38 +20,29 @@ export const registrarCita = async (req, res) => {
       });
     }
 
-    const responsable = await Usuario.findByPk(cita.idResponsable);
-    if (!responsable) {
-      return res.status(404).send({
-        success: false,
-        message: "Responsable no encontrado",
-      });
-    }
-
     const nuevaCita = await Cita.create({
       idPropiedad: cita.idPropiedad,
       idUsuario: cita.idUsuario,
-      idResponsable: cita.idResponsable,
-      fecha: cita.fecha,
-      estatus: cita.estatus,
+      fecha: new Date(cita.fecha),
+      estatus: cita.estatus || "en_proceso",
     });
 
-    return res.status(200).send({
+    return res.status(201).send({
       success: true,
-      message: "Cita registrada",
+      message: "Cita creada exitosamente",
       data: nuevaCita,
     });
   } catch (e) {
     console.log(e);
     return res.status(500).send({
       success: false,
-      message: "Error al registrar cita",
+      message: "Error al crear cita",
       error: e.message,
     });
   }
 };
 
-export const updateCita = async (req, res) => {
+export const actualizarCita = async (req, res) => {
   const { cita } = req.body;
   try {
     const findCita = await Cita.findByPk(cita.idCita);
@@ -63,11 +54,36 @@ export const updateCita = async (req, res) => {
       });
     }
 
-    await findCita.update(cita);
+    if (cita.idPropiedad) {
+      const propiedad = await Propiedad.findByPk(cita.idPropiedad);
+      if (!propiedad) {
+        return res.status(404).send({
+          success: false,
+          message: "Propiedad no encontrada",
+        });
+      }
+    }
+
+    if (cita.idUsuario) {
+      const usuario = await Usuario.findByPk(cita.idUsuario);
+      if (!usuario) {
+        return res.status(404).send({
+          success: false,
+          message: "Usuario no encontrado",
+        });
+      }
+    }
+
+    await findCita.update({
+      idPropiedad: cita.idPropiedad,
+      idUsuario: cita.idUsuario,
+      fecha: cita.fecha ? new Date(cita.fecha) : findCita.fecha,
+      estatus: cita.estatus,
+    });
 
     return res.status(200).send({
       success: true,
-      message: "Cita actualizada",
+      message: "Cita actualizada exitosamente",
     });
   } catch (e) {
     return res.status(500).send({
@@ -85,14 +101,24 @@ export const obtenerCitas = async (req, res) => {
         {
           model: Propiedad,
           as: "propiedad",
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: [
+                "idUsuario",
+                "nombre",
+                "apellido",
+                "email",
+                "telefono",
+              ],
+            },
+          ],
         },
         {
           model: Usuario,
           as: "usuario",
-        },
-        {
-          model: Usuario,
-          as: "responsable",
+          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
         },
       ],
     });
@@ -119,14 +145,24 @@ export const obtenerCitaPorId = async (req, res) => {
         {
           model: Propiedad,
           as: "propiedad",
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: [
+                "idUsuario",
+                "nombre",
+                "apellido",
+                "email",
+                "telefono",
+              ],
+            },
+          ],
         },
         {
           model: Usuario,
           as: "usuario",
-        },
-        {
-          model: Usuario,
-          as: "responsable",
+          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
         },
       ],
     });
@@ -167,12 +203,44 @@ export const eliminarCita = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "Cita eliminada",
+      message: "Cita eliminada exitosamente",
     });
   } catch (e) {
     return res.status(500).send({
       success: false,
       message: "Error al eliminar cita",
+      error: e.message,
+    });
+  }
+};
+
+export const obtenerCitasPorPropiedad = async (req, res) => {
+  const { idPropiedad } = req.params;
+  try {
+    const citas = await Cita.findAll({
+      where: { idPropiedad },
+      include: [
+        {
+          model: Propiedad,
+          as: "propiedad",
+        },
+        {
+          model: Usuario,
+          as: "usuario",
+          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: citas,
+      count: citas.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener citas por propiedad",
       error: e.message,
     });
   }
@@ -184,8 +252,23 @@ export const obtenerCitasPorUsuario = async (req, res) => {
     const citas = await Cita.findAll({
       where: { idUsuario },
       include: [
-        { model: Propiedad, as: "propiedad" },
-        { model: Usuario, as: "responsable" },
+        {
+          model: Propiedad,
+          as: "propiedad",
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: [
+                "idUsuario",
+                "nombre",
+                "apellido",
+                "email",
+                "telefono",
+              ],
+            },
+          ],
+        },
       ],
     });
 
@@ -197,20 +280,40 @@ export const obtenerCitasPorUsuario = async (req, res) => {
   } catch (e) {
     return res.status(500).send({
       success: false,
-      message: "Error al obtener citas del usuario",
+      message: "Error al obtener citas por usuario",
       error: e.message,
     });
   }
 };
 
 export const obtenerCitasPorResponsable = async (req, res) => {
-  const { idResponsable } = req.params;
+  const { idUsuario } = req.params;
   try {
     const citas = await Cita.findAll({
-      where: { idResponsable },
       include: [
-        { model: Propiedad, as: "propiedad" },
-        { model: Usuario, as: "usuario" },
+        {
+          model: Propiedad,
+          as: "propiedad",
+          where: { idUsuario },
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: [
+                "idUsuario",
+                "nombre",
+                "apellido",
+                "email",
+                "telefono",
+              ],
+            },
+          ],
+        },
+        {
+          model: Usuario,
+          as: "usuario",
+          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+        },
       ],
     });
 
@@ -222,35 +325,108 @@ export const obtenerCitasPorResponsable = async (req, res) => {
   } catch (e) {
     return res.status(500).send({
       success: false,
-      message: "Error al obtener citas del responsable",
+      message: "Error al obtener citas por responsable",
       error: e.message,
     });
   }
 };
 
-export const actualizarEstatusCita = async (req, res) => {
-  const { idCita } = req.params;
-  const { estatus } = req.body;
+export const obtenerCitasPorEstatus = async (req, res) => {
+  const { estatus } = req.params;
   try {
-    const findCita = await Cita.findByPk(idCita);
+    const citas = await Cita.findAll({
+      where: { estatus },
+      include: [
+        {
+          model: Propiedad,
+          as: "propiedad",
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: [
+                "idUsuario",
+                "nombre",
+                "apellido",
+                "email",
+                "telefono",
+              ],
+            },
+          ],
+        },
+        {
+          model: Usuario,
+          as: "usuario",
+          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+        },
+      ],
+    });
 
-    if (!findCita) {
-      return res.status(404).send({
-        success: false,
-        message: "Cita no encontrada",
-      });
-    }
-
-    await findCita.update({ estatus });
-
-    return res.status(200).send({
+    return res.status(200).json({
       success: true,
-      message: "Estatus de la cita actualizado",
+      data: citas,
+      count: citas.length,
     });
   } catch (e) {
     return res.status(500).send({
       success: false,
-      message: "Error al actualizar estatus",
+      message: "Error al obtener citas por estatus",
+      error: e.message,
+    });
+  }
+};
+
+export const obtenerCitasPorRangoFechas = async (req, res) => {
+  const { inicio, fin } = req.query;
+  try {
+    if (!inicio || !fin) {
+      return res.status(400).send({
+        success: false,
+        message: "Se requieren las fechas de inicio y fin",
+      });
+    }
+
+    const citas = await Cita.findAll({
+      where: {
+        fecha: {
+          [Op.between]: [new Date(inicio), new Date(fin)],
+        },
+      },
+      include: [
+        {
+          model: Propiedad,
+          as: "propiedad",
+          include: [
+            {
+              model: Usuario,
+              as: "usuario",
+              attributes: [
+                "idUsuario",
+                "nombre",
+                "apellido",
+                "email",
+                "telefono",
+              ],
+            },
+          ],
+        },
+        {
+          model: Usuario,
+          as: "usuario",
+          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: citas,
+      count: citas.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener citas por rango de fechas",
       error: e.message,
     });
   }
