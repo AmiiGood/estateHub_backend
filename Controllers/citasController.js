@@ -108,7 +108,8 @@ export const obtenerCitas = async (req, res) => {
               attributes: [
                 "idUsuario",
                 "nombre",
-                "apellido",
+                "apellidoPaterno",
+                "apellidoMaterno",
                 "email",
                 "telefono",
               ],
@@ -118,7 +119,14 @@ export const obtenerCitas = async (req, res) => {
         {
           model: Usuario,
           as: "usuario",
-          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+          attributes: [
+            "idUsuario",
+            "nombre",
+            "apellidoPaterno",
+            "apellidoMaterno",
+            "email",
+            "telefono",
+          ],
         },
       ],
     });
@@ -152,7 +160,8 @@ export const obtenerCitaPorId = async (req, res) => {
               attributes: [
                 "idUsuario",
                 "nombre",
-                "apellido",
+                "apellidoPaterno",
+                "apellidoMaterno",
                 "email",
                 "telefono",
               ],
@@ -162,7 +171,14 @@ export const obtenerCitaPorId = async (req, res) => {
         {
           model: Usuario,
           as: "usuario",
-          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+          attributes: [
+            "idUsuario",
+            "nombre",
+            "apellidoPaterno",
+            "apellidoMaterno",
+            "email",
+            "telefono",
+          ],
         },
       ],
     });
@@ -227,7 +243,14 @@ export const obtenerCitasPorPropiedad = async (req, res) => {
         {
           model: Usuario,
           as: "usuario",
-          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+          attributes: [
+            "idUsuario",
+            "nombre",
+            "apellidoPaterno",
+            "apellidoMaterno",
+            "email",
+            "telefono",
+          ],
         },
       ],
     });
@@ -262,7 +285,8 @@ export const obtenerCitasPorUsuario = async (req, res) => {
               attributes: [
                 "idUsuario",
                 "nombre",
-                "apellido",
+                "apellidoPaterno",
+                "apellidoMaterno",
                 "email",
                 "telefono",
               ],
@@ -302,7 +326,8 @@ export const obtenerCitasPorResponsable = async (req, res) => {
               attributes: [
                 "idUsuario",
                 "nombre",
-                "apellido",
+                "apellidoPaterno",
+                "apellidoMaterno",
                 "email",
                 "telefono",
               ],
@@ -312,7 +337,14 @@ export const obtenerCitasPorResponsable = async (req, res) => {
         {
           model: Usuario,
           as: "usuario",
-          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+          attributes: [
+            "idUsuario",
+            "nombre",
+            "apellidoPaterno",
+            "apellidoMaterno",
+            "email",
+            "telefono",
+          ],
         },
       ],
     });
@@ -347,7 +379,8 @@ export const obtenerCitasPorEstatus = async (req, res) => {
               attributes: [
                 "idUsuario",
                 "nombre",
-                "apellido",
+                "apellidoPaterno",
+                "apellidoMaterno",
                 "email",
                 "telefono",
               ],
@@ -357,7 +390,14 @@ export const obtenerCitasPorEstatus = async (req, res) => {
         {
           model: Usuario,
           as: "usuario",
-          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+          attributes: [
+            "idUsuario",
+            "nombre",
+            "apellidoPaterno",
+            "apellidoMaterno",
+            "email",
+            "telefono",
+          ],
         },
       ],
     });
@@ -403,7 +443,8 @@ export const obtenerCitasPorRangoFechas = async (req, res) => {
               attributes: [
                 "idUsuario",
                 "nombre",
-                "apellido",
+                "apellidoPaterno",
+                "apellidoMaterno",
                 "email",
                 "telefono",
               ],
@@ -413,7 +454,14 @@ export const obtenerCitasPorRangoFechas = async (req, res) => {
         {
           model: Usuario,
           as: "usuario",
-          attributes: ["idUsuario", "nombre", "apellido", "email", "telefono"],
+          attributes: [
+            "idUsuario",
+            "nombre",
+            "apellidoPaterno",
+            "apellidoMaterno",
+            "email",
+            "telefono",
+          ],
         },
       ],
     });
