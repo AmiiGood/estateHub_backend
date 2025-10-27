@@ -8,6 +8,7 @@ import {
     obtenerPagosRentaPorContrato,
     obtenerPagosRentaPorEstatus,
     obtenerPagosRentaPorRangoFechas,
+    actualizarEstatusPagoRenta,
 } from "../Controllers/pagosRentaController.js";
 
 const pagosRentaRouter = Router();
@@ -20,5 +21,6 @@ pagosRentaRouter.get("/getPagosRentaByRangoFechas", obtenerPagosRentaPorRangoFec
 pagosRentaRouter.post("/postPagoRenta", registrarPagoRenta);
 pagosRentaRouter.put("/putPagoRenta", updatePagoRenta);
 pagosRentaRouter.delete("/deletePagoRenta/:idPago", eliminarPagoRenta);
+pagosRentaRouter.patch("/patchPagoRenta/:idPago/estatus", actualizarEstatusPagoRenta);
 
 export default pagosRentaRouter;

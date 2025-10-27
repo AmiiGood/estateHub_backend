@@ -20,6 +20,21 @@ export const crearCita = async (req, res) => {
       });
     }
 
+    if (!usuario.estatus) {
+      return res.status(403).send({
+        success: false,
+        message: "No se puede crear una cita con un usuario inactivo",
+      });
+    }
+
+    if (propiedad.idUsuario === cita.idUsuario) {
+      return res.status(400).send({
+        success: false,
+        message:
+          "El dueño de la propiedad no puede agendar una cita para su propia propiedad",
+      });
+    }
+
     const nuevaCita = await Cita.create({
       idPropiedad: cita.idPropiedad,
       idUsuario: cita.idUsuario,
@@ -54,14 +69,17 @@ export const actualizarCita = async (req, res) => {
       });
     }
 
+    let propiedad;
     if (cita.idPropiedad) {
-      const propiedad = await Propiedad.findByPk(cita.idPropiedad);
+      propiedad = await Propiedad.findByPk(cita.idPropiedad);
       if (!propiedad) {
         return res.status(404).send({
           success: false,
           message: "Propiedad no encontrada",
         });
       }
+    } else {
+      propiedad = await Propiedad.findByPk(findCita.idPropiedad);
     }
 
     if (cita.idUsuario) {
@@ -70,6 +88,21 @@ export const actualizarCita = async (req, res) => {
         return res.status(404).send({
           success: false,
           message: "Usuario no encontrado",
+        });
+      }
+
+      if (!usuario.estatus) {
+        return res.status(403).send({
+          success: false,
+          message: "No se puede asignar una cita a un usuario inactivo",
+        });
+      }
+
+      if (propiedad.idUsuario === cita.idUsuario) {
+        return res.status(400).send({
+          success: false,
+          message:
+            "El dueño de la propiedad no puede agendar una cita para su propia propiedad",
         });
       }
     }
@@ -475,6 +508,45 @@ export const obtenerCitasPorRangoFechas = async (req, res) => {
     return res.status(500).send({
       success: false,
       message: "Error al obtener citas por rango de fechas",
+      error: e.message,
+    });
+  }
+};
+
+export const actualizarEstatusCita = async (req, res) => {
+  const { idCita } = req.params;
+  const { estatus } = req.body;
+  try {
+    const findCita = await Cita.findByPk(idCita);
+
+    if (!findCita) {
+      return res.status(404).send({
+        success: false,
+        message: "Cita no encontrada",
+      });
+    }
+
+    const estatusValidos = ["en_proceso", "cancelada", "completada"];
+    if (estatus && !estatusValidos.includes(estatus.toLowerCase())) {
+      return res.status(400).send({
+        success: false,
+        message: `Estatus no válido. Los estatus válidos son: ${estatusValidos.join(
+          ", "
+        )}`,
+      });
+    }
+
+    await findCita.update({ estatus });
+
+    return res.status(200).send({
+      success: true,
+      message: "Estatus de la cita actualizado",
+      data: findCita,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al actualizar estatus de la cita",
       error: e.message,
     });
   }

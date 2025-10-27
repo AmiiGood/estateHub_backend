@@ -1,14 +1,32 @@
-import { PagoRenta, Contrato } from "../Models/Asociaciones.js";
+import { PagoRenta, Contrato, Usuario } from "../Models/Asociaciones.js";
 import { Op } from "sequelize";
 
 export const registrarPagoRenta = async (req, res) => {
   const { pagoRenta } = req.body;
   try {
-    const contrato = await Contrato.findByPk(pagoRenta.idContrato);
+    const contrato = await Contrato.findByPk(pagoRenta.idContrato, {
+      include: [{ model: Usuario, as: "usuario" }],
+    });
+
     if (!contrato) {
       return res.status(404).send({
         success: false,
         message: "Contrato no encontrado",
+      });
+    }
+
+    if (!contrato.estatus) {
+      return res.status(403).send({
+        success: false,
+        message: "No se puede registrar un pago para un contrato inactivo",
+      });
+    }
+
+    if (!contrato.usuario.estatus) {
+      return res.status(403).send({
+        success: false,
+        message:
+          "No se puede registrar un pago para un contrato con usuario inactivo",
       });
     }
 
@@ -50,12 +68,30 @@ export const updatePagoRenta = async (req, res) => {
       });
     }
 
-    if (pagoRenta.idContrato) {
-      const contrato = await Contrato.findByPk(pagoRenta.idContrato);
-      if (!contrato) {
+    if (pagoRenta.idContrato && pagoRenta.idContrato !== findPago.idContrato) {
+      const nuevoContrato = await Contrato.findByPk(pagoRenta.idContrato, {
+        include: [{ model: Usuario, as: "usuario" }],
+      });
+
+      if (!nuevoContrato) {
         return res.status(404).send({
           success: false,
           message: "Contrato no encontrado",
+        });
+      }
+
+      if (!nuevoContrato.estatus) {
+        return res.status(403).send({
+          success: false,
+          message: "No se puede asignar un pago a un contrato inactivo",
+        });
+      }
+
+      if (!nuevoContrato.usuario.estatus) {
+        return res.status(403).send({
+          success: false,
+          message:
+            "No se puede asignar un pago a un contrato con usuario inactivo",
         });
       }
     }
@@ -226,6 +262,45 @@ export const obtenerPagosRentaPorRangoFechas = async (req, res) => {
     return res.status(500).send({
       success: false,
       message: "Error al obtener pagos por rango de fechas",
+      error: e.message,
+    });
+  }
+};
+
+export const actualizarEstatusPagoRenta = async (req, res) => {
+  const { idPago } = req.params;
+  const { estatus } = req.body;
+  try {
+    const findPago = await PagoRenta.findByPk(idPago);
+
+    if (!findPago) {
+      return res.status(404).send({
+        success: false,
+        message: "Pago de renta no encontrado",
+      });
+    }
+
+    const estatusValidos = ["pago_pendiente", "pago_recibido", "en_proceso"];
+    if (estatus && !estatusValidos.includes(estatus.toLowerCase())) {
+      return res.status(400).send({
+        success: false,
+        message: `Estatus no válido. Los estatus válidos son: ${estatusValidos.join(
+          ", "
+        )}`,
+      });
+    }
+
+    await findPago.update({ estatus });
+
+    return res.status(200).send({
+      success: true,
+      message: "Estatus del pago de renta actualizado",
+      data: findPago,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al actualizar estatus del pago",
       error: e.message,
     });
   }

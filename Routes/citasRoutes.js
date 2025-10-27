@@ -10,6 +10,7 @@ import {
   obtenerCitasPorEstatus,
   obtenerCitasPorRangoFechas,
   obtenerCitasPorPropiedad,
+  actualizarEstatusCita,
 } from "../Controllers/citasController.js";
 
 const citasRouter = Router();
@@ -27,5 +28,6 @@ citasRouter.get("/getCitasByFechas", obtenerCitasPorRangoFechas);
 citasRouter.post("/postCita", crearCita);
 citasRouter.put("/putCita", actualizarCita);
 citasRouter.delete("/deleteCita/:idCita", eliminarCita);
+citasRouter.patch("/patchCita/:idCita/estatus", actualizarEstatusCita);
 
 export default citasRouter;
