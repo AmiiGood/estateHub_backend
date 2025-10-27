@@ -24,6 +24,13 @@ export const registrarContrato = async (req, res) => {
       });
     }
 
+    if (!usuario.estatus) {
+      return res.status(403).send({
+        success: false,
+        message: "No se puede crear un contrato con un usuario inactivo",
+      });
+    }
+
     if (new Date(contrato.fechaFin) <= new Date(contrato.fechaInicio)) {
       return res.status(400).send({
         success: false,
@@ -67,6 +74,22 @@ export const updateContrato = async (req, res) => {
         message: "Contrato no encontrado",
       });
     }
+    
+    if (contrato.idUsuario && contrato.idUsuario !== findContrato.idUsuario) {
+      const nuevoUsuario = await Usuario.findByPk(contrato.idUsuario);
+      if (!nuevoUsuario) {
+        return res.status(404).send({
+          success: false,
+          message: "Usuario no encontrado",
+        });
+      }
+      if (!nuevoUsuario.estatus) {
+        return res.status(403).send({
+          success: false,
+          message: "No se puede asignar un usuario inactivo al contrato",
+        });
+      }
+    }
 
     const nuevaFechaInicio = contrato.fechaInicio || findContrato.fechaInicio;
     const nuevaFechaFin = contrato.fechaFin || findContrato.fechaFin;
@@ -88,39 +111,6 @@ export const updateContrato = async (req, res) => {
     return res.status(500).send({
       success: false,
       message: "Error al actualizar contrato",
-      error: e.message,
-    });
-  }
-};
-
-export const obtenerContratos = async (req, res) => {
-  try {
-    const contratos = await Contrato.findAll({
-      include: [
-        {
-          model: Propiedad,
-          as: "propiedad",
-        },
-        {
-          model: Usuario,
-          as: "usuario",
-        },
-        {
-          model: PagoRenta,
-          as: "pagos",
-        },
-      ],
-    });
-
-    return res.status(200).json({
-      success: true,
-      data: contratos,
-      count: contratos.length,
-    });
-  } catch (e) {
-    return res.status(500).send({
-      success: false,
-      message: "Error al obtener contratos",
       error: e.message,
     });
   }
