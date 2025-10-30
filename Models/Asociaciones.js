@@ -4,6 +4,7 @@ import { Propiedad } from "./Propiedad.js";
 import { Usuario } from "./Usuario.js";
 import { Cita } from "./Cita.js";
 import { PagoRenta } from "./PagoRenta.js";
+import { ImagenesPropiedad } from "./ImagenesPropiedad.js";
 
 Propiedad.hasMany(Contrato, {
   foreignKey: "idPropiedad",
@@ -83,6 +84,16 @@ PagoRenta.belongsTo(Contrato, {
 Contrato.hasMany(PagoRenta, {
   foreignKey: "idContrato",
   as: "pagos",
+});
+
+Propiedad.hasMany(ImagenesPropiedad, {
+  foreignKey: "idPropiedad",
+  as: "imagenes",
+});
+
+ImagenesPropiedad.belongsTo(Propiedad, {
+  foreignKey: "idPropiedad",
+  as: "propiedad",
 });
 
 export { Contrato, Propiedad, Usuario, Cita, PagoRenta };

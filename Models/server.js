@@ -20,6 +20,7 @@ import { GastosMantenimiento } from "./GastosMantenimiento.js";
 import { PagoRenta } from "./PagoRenta.js";
 import { Notificacion } from "./Notificacion.js";
 import gastosMantenimientoRouter from "../Routes/GastosMantenimientoRoutes.js";
+import { ImagenesPropiedad } from "./ImagenesPropiedad.js";
 
 export class Server {
   constructor() {
@@ -33,6 +34,7 @@ export class Server {
   middlewares() {
     this.app.use(cors());
     this.app.use(express.json());
+    this.app.use("/uploads", express.static("uploads"));
   }
 
   async connection() {
@@ -45,6 +47,7 @@ export class Server {
       await GastosMantenimiento.sync();
       await Cita.sync();
       await Notificacion.sync();
+      await ImagenesPropiedad.sync();
       console.log("Conectado");
     } catch (e) {
       console.log(e);

@@ -1,5 +1,6 @@
 import { where } from "sequelize";
 import { Propiedad } from "../Models/Propiedad.js";
+import { ImagenesPropiedad } from "../Models/ImagenesPropiedad.js";
 
 export const registrarPropiedad = async (req, res) => {
   const { propiedad } = req.body;
@@ -193,6 +194,45 @@ export const publicarEcommerce = async (req, res) => {
     return res.status(500).send({
       success: false,
       data: "Error al publicar en ecommerce",
+      error: e.message,
+    });
+  }
+};
+
+export const subirFotos = async (req, res) => {
+  const { idPropiedad } = req.params;
+  const fotos = req.files;
+  try {
+    const baseURL = `http://localhost:3000/uploads/`;
+    const propiedad = await Propiedad.findByPk(idPropiedad);
+    if (!propiedad) {
+      return res.status(404).send({
+        success: false,
+        message: "Propiedad no encontrada",
+      });
+    }
+    console.log(fotos);
+    const fotosSubidas = [];
+    for (let foto of fotos) {
+      const uploadedFoto = await ImagenesPropiedad.create({
+        idPropiedad: propiedad.idPropiedad,
+        urlImagen: baseURL + foto.filename,
+        esPrincipal: false,
+        fechaSubida: Date.now(),
+      });
+
+      fotosSubidas.push(uploadedFoto);
+    }
+
+    return res.status(200).send({
+      success: true,
+      message: "Fotos subidas",
+      fotos: fotosSubidas,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      data: "Error al subir fotos",
       error: e.message,
     });
   }
