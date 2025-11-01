@@ -86,7 +86,6 @@ export const registrarUsuario = async (req, res) => {
       apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
       tipoUsuario: usuario.tipoUsuario,
-      fechaRegistro: usuario.fechaRegistro,
       activo: true,
     });
 
@@ -115,6 +114,13 @@ export const editarUsuario = async (req, res) => {
     const saltRounds = 10;
     passwordHash = await bcrypt.hash(usuario.password, saltRounds);
   }
+  const existe = await Usuario.findOne({ where: { email: usuario.email } });
+    if (existe) {
+      return res.status(409).json({
+        success: false,
+        message: "El correo ya está registrado.",
+      });
+    }
 
   try {
     await user.update({
