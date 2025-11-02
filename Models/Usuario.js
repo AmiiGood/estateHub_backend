@@ -35,10 +35,6 @@ export const Usuario = databaseConnection.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    tipoUsuario: {
-      type: DataTypes.ENUM("arrendatario", "propiertario"),
-      allowNull: false,
-    },
     fechaRegistro: {
       type: DataTypes.DATE,
       allowNull: false,

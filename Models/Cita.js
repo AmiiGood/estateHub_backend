@@ -28,15 +28,6 @@ export const Cita = databaseConnection.define(
       },
     },
 
-    idResponsable: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "usuarios",
-        key: "idUsuario",
-      },
-    },
-
     fecha: {
       type: DataTypes.DATE,
       allowNull: false,

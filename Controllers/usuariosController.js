@@ -58,7 +58,7 @@ export const registrarUsuario = async (req, res) => {
   const { usuario } = req.body;
   console.log(" Body recibido:", req.body);
 
-  if (!usuario || !usuario.email?.trim() || !usuario.password?.trim() || !usuario.nombre?.trim() || !usuario.apellidoPaterno?.trim() || !usuario.apellidoMaterno?.trim() || !usuario.tipoUsuario?.trim()) {
+  if (!usuario || !usuario.email?.trim() || !usuario.password?.trim() || !usuario.nombre?.trim() || !usuario.apellidoPaterno?.trim() || !usuario.apellidoMaterno?.trim()) {
   return res.status(400).json({
     success: false,
     message: "Campos requeridos faltantes o vacíos.",
@@ -85,7 +85,6 @@ export const registrarUsuario = async (req, res) => {
       apellidoPaterno: usuario.apellidoPaterno,
       apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
-      tipoUsuario: usuario.tipoUsuario,
       activo: true,
     });
 
@@ -108,6 +107,7 @@ export const editarUsuario = async (req, res) => {
       message: "Usuario no encontrado",
     });
   }
+  
 
   let passwordHash = user.passwordHash;
   if (usuario.password && usuario.password.trim() !== "") {
@@ -130,7 +130,6 @@ export const editarUsuario = async (req, res) => {
       apellidoPaterno: usuario.apellidoPaterno,
       apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
-      tipoUsuario: usuario.tipoUsuario,
     });
     return res.status(200).send({
       message: "Usuario editado exitosamente",
