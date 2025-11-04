@@ -35,10 +35,6 @@ export const Usuario = databaseConnection.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    tipoUsuario: {
-      type: DataTypes.ENUM("arrendatario", "propiertario"),
-      allowNull: false,
-    },
     fechaRegistro: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -46,10 +42,13 @@ export const Usuario = databaseConnection.define(
     activo: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: true,
     },
   },
   {
-    tableName: "usuarios",
-    timestamps: false,
-  }
-);
+    timestamps: true,
+    createdAt: 'fechaRegistro',
+    updatedAt: false,
+    freezeTableName: true,
+    paranoid: false,
+  });

@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
   registrarContrato,
   updateContrato,
-  obtenerContratos,
   obtenerContratoPorId,
   eliminarContrato,
   obtenerContratosPorUsuario,
@@ -10,26 +9,31 @@ import {
   obtenerContratosActivos,
   actualizarEstatusContrato,
 } from "../Controllers/contratosController.js";
+import { verificarToken } from "../Middlewares/auth.js";
 
 const contratosRouter = Router();
 
-contratosRouter.get("/getContratos", obtenerContratos);
-contratosRouter.get("/getContratosActivos", obtenerContratosActivos);
-contratosRouter.get("/getContrato/:idContrato", obtenerContratoPorId);
+contratosRouter.get("/getContratosActivos", verificarToken, obtenerContratosActivos);
+contratosRouter.get("/getContrato/:idContrato", verificarToken, obtenerContratoPorId);
 contratosRouter.get(
   "/getContratosByUsuario/:idUsuario",
+  verificarToken,
   obtenerContratosPorUsuario
 );
 contratosRouter.get(
   "/getContratosByPropiedad/:idPropiedad",
+  verificarToken,
   obtenerContratosPorPropiedad
 );
-contratosRouter.post("/postContrato", registrarContrato); //check
-contratosRouter.put("/putContrato", updateContrato);
+contratosRouter.post("/postContrato",verificarToken, registrarContrato); //check
+contratosRouter.put("/putContrato",verificarToken, updateContrato);
 contratosRouter.put(
   "/putEstatusContrato/:idContrato",
+  verificarToken,
   actualizarEstatusContrato
 );
-contratosRouter.delete("/deleteContrato/:idContrato", eliminarContrato);
+contratosRouter.delete("/deleteContrato/:idContrato",
+  verificarToken,
+  eliminarContrato);
 
 export default contratosRouter;

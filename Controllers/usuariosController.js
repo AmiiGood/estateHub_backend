@@ -7,6 +7,11 @@ export const getAllUsuarios = async (req, res) => {
     const usuarios = await Usuario.findAll({
       attributes: { exclude: ["passwordHash"] },
     });
+    if (usuarios.length === 0) {
+      return res.status(204).json({
+        success: false,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -30,7 +35,9 @@ export const getUsuario = async (req, res) => {
     });
   }
 
-  const user = await Usuario.findByPk(idUsuario);
+  const user = await Usuario.findByPk(idUsuario, {
+    attributes: { exclude: ["passwordHash"] },
+  });
 
   try {
     return res.status(200).json({
@@ -49,6 +56,29 @@ export const getUsuario = async (req, res) => {
 export const registrarUsuario = async (req, res) => {
   const { usuario } = req.body;
   console.log(" Body recibido:", req.body);
+
+  if (
+    !usuario ||
+    !usuario.email?.trim() ||
+    !usuario.password?.trim() ||
+    !usuario.nombre?.trim() ||
+    !usuario.apellidoPaterno?.trim() ||
+    !usuario.apellidoMaterno?.trim()
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Campos requeridos faltantes o vacíos.",
+    });
+  }
+
+  const existe = await Usuario.findOne({ where: { email: usuario.email } });
+  if (existe) {
+    return res.status(409).json({
+      success: false,
+      message: "El correo ya está registrado.",
+    });
+  }
+
   const saltRounds = 10;
   const passwordHash = await bcrypt.hash(usuario.password, saltRounds);
   try {
@@ -60,9 +90,7 @@ export const registrarUsuario = async (req, res) => {
       apellidoPaterno: usuario.apellidoPaterno,
       apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
-      tipoUsuario: usuario.tipoUsuario,
-      fechaRegistro: usuario.fechaRegistro,
-      activo: usuario.activo,
+      activo: true,
     });
 
     return res.status(200).send({
@@ -90,6 +118,13 @@ export const editarUsuario = async (req, res) => {
     const saltRounds = 10;
     passwordHash = await bcrypt.hash(usuario.password, saltRounds);
   }
+  const existe = await Usuario.findOne({ where: { email: usuario.email } });
+  if (existe) {
+    return res.status(409).json({
+      success: false,
+      message: "El correo ya está registrado.",
+    });
+  }
 
   try {
     await user.update({
@@ -99,8 +134,6 @@ export const editarUsuario = async (req, res) => {
       apellidoPaterno: usuario.apellidoPaterno,
       apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
-      tipoUsuario: usuario.tipoUsuario,
-      activo: usuario.activo,
     });
     return res.status(200).send({
       message: "Usuario editado exitosamente",
@@ -137,7 +170,7 @@ export const eliminarUsuario = async (req, res) => {
       });
     }
 
-    await user.destroy();
+    await user.update({ activo: false });
 
     return res.status(200).send({
       message: "Usuario eliminado exitosamente",

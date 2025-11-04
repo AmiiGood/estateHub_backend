@@ -10,6 +10,7 @@ import {
   subirFotos,
   updatePropiedad,
 } from "../Controllers/propiedadesController.js";
+import { verificarToken } from "../Middlewares/auth.js";
 
 const propiedadesRouter = Router();
 
@@ -24,5 +25,9 @@ propiedadesRouter.post(
   upload.array("fotos", 10),
   subirFotos
 );
+propiedadesRouter.post("/postPropiedad", verificarToken, registrarPropiedad);
+propiedadesRouter.put("/putPropiedad", verificarToken, updatePropiedad);
+propiedadesRouter.delete("/deletePropiedad/:idPropiedad",verificarToken, eliminarPropiedad);
+propiedadesRouter.put("/postEcommerce/:idPropiedad",verificarToken, publicarEcommerce);
 
 export default propiedadesRouter;

@@ -21,6 +21,7 @@ import { PagoRenta } from "./PagoRenta.js";
 import { Notificacion } from "./Notificacion.js";
 import gastosMantenimientoRouter from "../Routes/GastosMantenimientoRoutes.js";
 import { ImagenesPropiedad } from "./ImagenesPropiedad.js";
+import loginRouter from "../Routes/loginRoutes.js";
 
 export class Server {
   constructor() {
@@ -64,6 +65,8 @@ export class Server {
     this.app.use("/api/contratos", contratosRouter);
     this.app.use("/api/pagosRenta", pagosRentaRouter);
     this.app.use("/api/gastosMantenimiento", gastosMantenimientoRouter);
+
+    this.app.use("/api/login", loginRouter);
   }
 
   startServer() {

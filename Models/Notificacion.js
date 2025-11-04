@@ -35,11 +35,13 @@ export const Notificacion = databaseConnection.define("notificaciones", {
   leida: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
+    defaultValue: false,
   },
 
   fechaEnvio: {
     type: DataTypes.DATE,
     allowNull: false,
+    defaultValue: DataTypes.NOW,
   },
 },{
   tableName: 'notificaciones',
