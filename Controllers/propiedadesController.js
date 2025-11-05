@@ -104,7 +104,14 @@ export const updatePropiedad = async (req, res) => {
 
 export const obtenerPropiedades = async (req, res) => {
   try {
-    const propiedades = await Propiedad.findAll();
+    const propiedades = await Propiedad.findAll({
+      include: [
+        {
+          model: ImagenesPropiedad,
+          as: "imagenes",
+        },
+      ],
+    });
 
     return res.status(200).json({
       success: true,
@@ -131,7 +138,14 @@ export const obtenerPropiedad = async (req, res) => {
   }
 
   try {
-    const propiedad = await Propiedad.findByPk(idPropiedad);
+    const propiedad = await Propiedad.findByPk(idPropiedad, {
+      include: [
+        {
+          model: ImagenesPropiedad,
+          as: "imagenes",
+        },
+      ],
+    });
 
     if (propiedad == null) {
       return res.status(444).send({
