@@ -73,7 +73,7 @@ export class Server {
   }
 
   startServer() {
-    this.app.listen(this.port, () => {
+    this.app.listen(this.port, "0.0.0.0", () => {
       console.log(`Servidor corriendo en el puerto ${this.port}`);
     });
   }
