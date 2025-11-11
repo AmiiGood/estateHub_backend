@@ -3,12 +3,6 @@ dotenv.config();
 import { Pool } from "pg";
 import { Sequelize } from "sequelize";
 
-const host = process.env.HOST;
-const user = process.env.USER;
-const password = process.env.PASSWORD;
-const database = process.env.DATABASE;
-const port = process.env.PORT;
-
 const hostg = process.env.HOSTG;
 const userg = process.env.USERG;
 const passwordg = process.env.PASSWORDG;
@@ -21,24 +15,5 @@ const databaseConnection = new Sequelize(databaseg, userg, `${passwordg}`, {
   dialect: "postgres",
   port: portg,
 });
-
-/*
-const pool = new Pool({
-  host: hostg,
-  user: userg,
-  password: `${passwordg}`,
-  database: databaseg,
-  port: portg,
-});
-
-pool.connect((err, res) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log("Conectado con exito");
-  }
-});
-
-*/
 
 export default databaseConnection;

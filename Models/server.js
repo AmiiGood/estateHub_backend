@@ -35,7 +35,7 @@ export class Server {
   middlewares() {
     this.app.use(cors());
     this.app.use(express.json());
-    this.app.use("/uploads", express.static("uploads"));
+    //this.app.use("/uploads", express.static("uploads"));
   }
 
   async connection() {
@@ -50,6 +50,9 @@ export class Server {
       await Notificacion.sync();
       await ImagenesPropiedad.sync();
       console.log("Conectado");
+
+      await pool;
+      console.log("GeoConectado");
     } catch (e) {
       console.log(e);
     }
