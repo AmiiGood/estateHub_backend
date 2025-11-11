@@ -1,6 +1,7 @@
 import { where } from "sequelize";
 import { Propiedad } from "../Models/Propiedad.js";
 import { ImagenesPropiedad } from "../Models/ImagenesPropiedad.js";
+import { cloudinary } from "../Config/cloudinary.js";
 
 export const registrarPropiedad = async (req, res) => {
   const { propiedad } = req.body;
@@ -216,37 +217,87 @@ export const publicarEcommerce = async (req, res) => {
 export const subirFotos = async (req, res) => {
   const { idPropiedad } = req.params;
   const fotos = req.files;
+
   try {
-    const baseURL = `http://localhost:3000/uploads/`;
     const propiedad = await Propiedad.findByPk(idPropiedad);
+
     if (!propiedad) {
       return res.status(404).send({
         success: false,
         message: "Propiedad no encontrada",
       });
     }
-    console.log(fotos);
+
+    if (!fotos || fotos.length === 0) {
+      return res.status(400).send({
+        success: false,
+        message: "No se han enviado archivos",
+      });
+    }
+
     const fotosSubidas = [];
+
     for (let foto of fotos) {
       const uploadedFoto = await ImagenesPropiedad.create({
         idPropiedad: propiedad.idPropiedad,
-        urlImagen: baseURL + foto.filename,
-        esPrincipal: false,
+        urlImagen: foto.path,
         fechaSubida: Date.now(),
       });
 
-      fotosSubidas.push(uploadedFoto);
+      fotosSubidas.push({
+        id: uploadedFoto.idImagen,
+        url: foto.path,
+        publicId: foto.filename,
+      });
     }
 
     return res.status(200).send({
       success: true,
-      message: "Fotos subidas",
+      message: "Fotos subidas exitosamente",
       fotos: fotosSubidas,
     });
   } catch (e) {
+    console.log(e);
     return res.status(500).send({
       success: false,
-      data: "Error al subir fotos",
+      message: "Error al subir fotos",
+      error: e.message,
+    });
+  }
+};
+
+export const eliminarFoto = async (req, res) => {
+  const { idImagen } = req.params;
+
+  try {
+    const imagen = await ImagenesPropiedad.findByPk(idImagen);
+
+    if (!imagen) {
+      return res.status(404).send({
+        success: false,
+        message: "Imagen no encontrada",
+      });
+    }
+
+    const urlParts = imagen.urlImagen.split("/");
+    const publicIdWithExtension = urlParts[urlParts.length - 1];
+    const publicId = `estatehub/propiedades/${
+      publicIdWithExtension.split(".")[0]
+    }`;
+
+    await cloudinary.uploader.destroy(publicId);
+
+    await imagen.destroy();
+
+    return res.status(200).send({
+      success: true,
+      message: "Imagen eliminada exitosamente",
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      success: false,
+      message: "Error al eliminar imagen",
       error: e.message,
     });
   }

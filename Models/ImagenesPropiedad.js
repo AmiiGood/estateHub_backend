@@ -9,7 +9,6 @@ export const ImagenesPropiedad = databaseConnection.define(
       primaryKey: true,
       autoIncrement: true,
     },
-
     idPropiedad: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -22,7 +21,6 @@ export const ImagenesPropiedad = databaseConnection.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-
     fechaSubida: {
       type: DataTypes.DATE,
       allowNull: false,
