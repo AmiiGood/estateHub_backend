@@ -1,4 +1,5 @@
 import { where } from "sequelize";
+import { Op } from "sequelize";
 import { Propiedad } from "../Models/Propiedad.js";
 import { ImagenesPropiedad } from "../Models/ImagenesPropiedad.js";
 import { cloudinary } from "../Config/cloudinary.js";
@@ -105,7 +106,37 @@ export const updatePropiedad = async (req, res) => {
 
 export const obtenerPropiedades = async (req, res) => {
   try {
+    const {
+      ciudad,
+      estado,
+      tipoPropiedad,
+      precioMin,
+      precioMax,
+      habitaciones,
+      banios,
+      publicadoEcommerce,
+    } = req.query;
+
+    const where = {};
+
+    if (ciudad) where.ciudad = ciudad;
+    if (estado) where.estado = estado;
+    if (tipoPropiedad) where.tipoPropiedad = tipoPropiedad;
+
+    if (precioMin || precioMax) {
+      where.precioVenta = {};
+      if (precioMin) where.precioVenta[Op.gte] = precioMin;
+      if (precioMax) where.precioVenta[Op.lte] = precioMax;
+    }
+
+    if (habitaciones) where.numHabitaciones = habitaciones;
+    if (banios) where.numBanios = banios;
+
+    if (publicadoEcommerce !== undefined)
+      where.publicadoEcommerce = publicadoEcommerce === "true";
+
     const propiedades = await Propiedad.findAll({
+      where,
       include: [
         {
           model: ImagenesPropiedad,
