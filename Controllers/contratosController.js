@@ -24,7 +24,7 @@ export const registrarContrato = async (req, res) => {
       });
     }
 
-    if (!usuario.estatus) {
+    if (!usuario.activo) {
       return res.status(403).send({
         success: false,
         message: "No se puede crear un contrato con un usuario inactivo",
