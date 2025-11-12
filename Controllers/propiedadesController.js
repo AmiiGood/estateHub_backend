@@ -39,8 +39,9 @@ export const registrarPropiedad = async (req, res) => {
     });
 
     return res.status(200).send({
-      succes: true,
+      success: true,
       message: "Propiedad registrada",
+      data: newPropiedad,
     });
   } catch (e) {
     console.log(e);
@@ -217,7 +218,7 @@ export const subirFotos = async (req, res) => {
   const { idPropiedad } = req.params;
   const fotos = req.files;
   try {
-    const baseURL = `http://localhost:3000/uploads/`;
+    const baseURL = "http://localhost:3000/uploads/";
     const propiedad = await Propiedad.findByPk(idPropiedad);
     if (!propiedad) {
       return res.status(404).send({
