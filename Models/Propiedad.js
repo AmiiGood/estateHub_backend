@@ -2,13 +2,13 @@ import { Sequelize, DataTypes } from "sequelize";
 import databaseConnection from "../Config/connection.js";
 
 export const Propiedad = databaseConnection.define("propiedad", {
-  idPropiedad: {
+  id_propiedad: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
 
-  idUsuario: {
+  id_usuario: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
