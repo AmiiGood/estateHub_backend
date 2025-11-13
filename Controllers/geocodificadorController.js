@@ -19,6 +19,7 @@ const buscador_info = async (req, res) => {
             codigoPostal: null,
             calle: null,
             ageb: null,
+            agebCompleto: null,
             nse: null,
             poi: null,
             denue: null
@@ -186,6 +187,28 @@ const buscador_info = async (req, res) => {
                 } else {
                     // SI NO HAY FILAS, SE ASIGNA NULL A LOS PARÁMETROS
                     params.poi = null
+                }
+
+
+                const queryAgebCompleto = `SELECT "POLYGON_NAME", "POBTOT", "POBMAS", "POBFEM", "POB15_64", 
+                "POB65_MAS", "PEA", "POCUPADA", "PDESOCUP", "PDER_SS", "PSINDER", "P15YM_AN", "P15SEC_COM", 
+                "VPH_C_SERV", "VPH_AUTOM", "VPH_INTER", "PRO_OCUP_C", "TVIVHAB", "VIVPAR_DES", "PHOGJEF_F", 
+                "TOTHOG", "P_18A24", "P_60YMAS", "P6A11_NOA", "P12A14NOA", "PDER_IMSS", "PDER_ISTE", "VPH_CEL", 
+                "VPH_LAVAD", "VPH_REFRI" 
+                FROM carto_ageb_2020 WHERE ST_Intersects("SP_GEOMETRY", $1) AND id_region = $2 AND id_estado = $3 AND id_municipio = $4 LIMIT 1;`
+
+                let agebCompleto = await pool.query(queryAgebCompleto, [
+                                        respuesta.rows[0].points, 
+                                        params.region.id_region, 
+                                        params.estado.id_estado, 
+                                        params.municipio.id_municipio
+                                    ]);
+
+                if(agebCompleto.rowCount > 0){
+                    params.ageb = agebCompleto.rows[0];
+                    precision++;
+                } else {
+                    params.ageb = null;
                 }
                 // SE VERIFICA SI NO HAY ERRORES
                 if (!error) {
