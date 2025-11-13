@@ -173,7 +173,7 @@ const buscador_info = async (req, res) => {
                         WHEN "numero" = '' THEN 'SIN NUMERO EXTERIOR'
                         ELSE "numero" 
                     END) as "numero",
-                "codigo_postal", "calle", "municipio", "estado", "region"
+                "codigo_postal", "calle", "municipio", "estado", "region", "clase"
                 FROM carto_poi
                 WHERE st_DWITHIN("SP_GEOMETRY"::geography, $1, 700) AND id_region = $2
                 ORDER BY ST_Distance("SP_GEOMETRY"::geography, $1);`;
