@@ -3,10 +3,9 @@ import pool from "../Config/geoConnection.js"; //// Se importa la configuración
 
 // FUNCIÓN PARA REALIZAR BÚSQUEDAS DE INFORMACIÓN
 export const buscadorInfo = async (req, res) => {
-  try {
-    // SE OBTIENEN LOS PARÁMETROS DE LA PETICIÓN
-    const input = ({ lat, long, limite, id_region } = req.body);
+  const { lat, long, id_region } = req.body;
 
+  try {
     // SE INICIALIZAN LOS PARÁMETROS A RETORNAR
     let params = {
       region: null,
@@ -283,6 +282,9 @@ export const buscadorInfo = async (req, res) => {
   } catch (error) {
     // EN CASO DE UN ERROR, SE ENVÍA UNA RESPUESTA DE ERROR CON EL MENSAJE DE ERROR
     console.log(error);
-    sendErrorResponse(res, 500, error.message);
+    return res.status(500).send({
+      ok: false,
+      params: error.message,
+    });
   }
 };
