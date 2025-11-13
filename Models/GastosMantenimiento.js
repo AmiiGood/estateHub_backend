@@ -1,16 +1,16 @@
-import databaseConnection from "../Config/connection";
+import databaseConnection from "../Config/connection.js";
 
-const { Sequelize, DataTypes } = require("sequelize");
+import { Sequelize, DataTypes } from "sequelize";
 
-export const Gastos_mantenimiento = databaseConnection.define(
+export const GastosMantenimiento = databaseConnection.define(
   "gastos_mantenimiento",
   {
-    id_gasto: {
+    idGasto: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    id_propiedad: {
+    idPropiedad: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -26,7 +26,7 @@ export const Gastos_mantenimiento = databaseConnection.define(
       type: DataTypes.DOUBLE,
       allowNull: false,
     },
-    fecha_gasto: {
+    fechaGasto: {
       type: DataTypes.DATE,
       allowNull: false,
     },
@@ -38,9 +38,17 @@ export const Gastos_mantenimiento = databaseConnection.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    fecha_registro: {
+    fechaRegistro: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+  },
+  {
+    timestamps: true,
+    createdAt: "fechaGasto",
+    updatedAt: false,
+    deletedAt: true,
+    freezeTableName: true,
+    paranoid: true,
   }
 );
