@@ -3,9 +3,10 @@ import pool from "../Config/geoConnection.js"; //// Se importa la configuración
 
 // FUNCIÓN PARA REALIZAR BÚSQUEDAS DE INFORMACIÓN
 export const buscadorInfo = async (req, res) => {
-  const { lat, long, id_region } = req.body;
-
   try {
+    // SE OBTIENEN LOS PARÁMETROS DE LA PETICIÓN
+    const { lat, long, limite, id_region } = req.body;
+
     // SE INICIALIZAN LOS PARÁMETROS A RETORNAR
     let params = {
       region: null,
@@ -45,7 +46,7 @@ export const buscadorInfo = async (req, res) => {
                 (SELECT ST_SetSRID( ST_Point($1, $2)::geometry, 4326) AS points, 
                 ST_INTERSECTS("SP_GEOMETRY", (ST_SetSRID( ST_Point($1, $2)::geometry, 4326))) as intersects 
                 FROM carto_region r WHERE r.id_region = ANY ($3::INT[])) as t1 WHERE intersects = true`,
-        [input.long, input.lat, idRegion]
+        [long, lat, id_region]
       );
       if (respuesta.rows[0].intersects) {
         // SE EJECUTAN CONSULTAS PARA OBTENER INFORMACIÓN DETALLADA DE LA REGIÓN, EL ESTADO, EL MUNICIPIO Y LA LOCALIDAD
@@ -282,9 +283,10 @@ export const buscadorInfo = async (req, res) => {
   } catch (error) {
     // EN CASO DE UN ERROR, SE ENVÍA UNA RESPUESTA DE ERROR CON EL MENSAJE DE ERROR
     console.log(error);
+
     return res.status(500).send({
-      ok: false,
-      params: error.message,
+      success: false,
+      message: "Hubo un error",
     });
   }
 };
