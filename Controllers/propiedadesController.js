@@ -59,6 +59,21 @@ export const updatePropiedad = async (req, res) => {
   try {
     const findPropiedad = await Propiedad.findByPk(propiedad.idPropiedad);
 
+    if (!findPropiedad) {
+      return res.status(404).json({
+        success: false,
+        message: "Propiedad no encontrada"
+      });
+    }
+
+    if (findPropiedad.idUsuario !== req.usuario.idUsuario) {
+  return res.status(403).json({
+    success: false,
+    message: "No tienes permisos para editar esta propiedad"
+  });
+}
+
+
     const updatedPropiedad = await findPropiedad.update({
       idPropiedad: propiedad.idPropiedad,
       titulo: propiedad.titulo,
@@ -87,7 +102,8 @@ export const updatePropiedad = async (req, res) => {
       cuartoServicio: propiedad.cuartoServicio,
       muebles: propiedad.muebles,
       credito: propiedad.credito,
-      publicarEcommerce: propiedad.publicadoEcommerce,
+      publicadoEcommerce: propiedad.publicadoEcommerce,
+
     });
 
     return res.status(200).send({
@@ -171,6 +187,20 @@ export const eliminarPropiedad = async (req, res) => {
   const { idPropiedad } = req.params;
   try {
     const findPropiedad = await Propiedad.findByPk(idPropiedad);
+    if (!findPropiedad) {
+  return res.status(404).json({
+    success: false,
+    message: "Propiedad no encontrada"
+  });
+}
+
+    if (findPropiedad.idUsuario !== req.usuario.idUsuario) {
+  return res.status(403).json({
+    success: false,
+    message: "No puedes eliminar propiedades que no son tuyas"
+  });
+}
+
 
     const deletedPropiedad = await findPropiedad.destroy();
 
@@ -209,6 +239,32 @@ export const publicarEcommerce = async (req, res) => {
     return res.status(500).send({
       success: false,
       data: "Error al publicar en ecommerce",
+      error: e.message,
+    });
+  }
+};
+export const obtenerPropiedadesPorUsuario = async (req, res) => {
+  const { idUsuario } = req.params;
+  try {
+    const propiedades = await Propiedad.findAll({
+      include: [
+        {
+          model: ImagenesPropiedad,
+          as: "imagenes",
+        },
+      ],
+      where: { idUsuario },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: propiedades,
+      count: propiedades.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener propiedades del usuario",
       error: e.message,
     });
   }
