@@ -4,6 +4,7 @@ import {
   eliminarPropiedad,
   obtenerPropiedad,
   obtenerPropiedades,
+  obtenerPropiedadesPorUsuario,
   publicarEcommerce,
   registrarPropiedad,
   subirFotos,
@@ -34,10 +35,10 @@ propiedadesRouter.post(
   upload.array("fotos", 10),
   subirFotos
 );
-propiedadesRouter.delete(
-  "/eliminarFoto/:idImagen",
-  verificarToken,
-  eliminarFoto
-);
+propiedadesRouter.post("/postPropiedad", verificarToken, registrarPropiedad);
+propiedadesRouter.put("/putPropiedad", verificarToken, updatePropiedad);
+propiedadesRouter.delete("/deletePropiedad/:idPropiedad",verificarToken, eliminarPropiedad);
+propiedadesRouter.put("/postEcommerce/:idPropiedad",verificarToken, publicarEcommerce);
+propiedadesRouter.get("/getPropiedadesByUsuario/:idUsuario",verificarToken, obtenerPropiedadesPorUsuario)
 
 export default propiedadesRouter;
