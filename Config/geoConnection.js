@@ -1,3 +1,5 @@
+import { Pool } from "pg";
+
 const host = process.env.HOST;
 const user = process.env.USER;
 const password = process.env.PASSWORD;
