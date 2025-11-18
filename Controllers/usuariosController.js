@@ -2,6 +2,7 @@ import e from "cors";
 import { Usuario } from "../Models/Usuario.js";
 import bcrypt from "bcrypt";
 
+
 export const getAllUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll({
@@ -54,6 +55,7 @@ export const getUsuario = async (req, res) => {
 };
 
 export const registrarUsuario = async (req, res) => {
+  console.log(" Params recibidos:", req.params);
   const { usuario } = req.body;
   console.log(" Body recibido:", req.body);
 
@@ -118,13 +120,7 @@ export const editarUsuario = async (req, res) => {
     const saltRounds = 10;
     passwordHash = await bcrypt.hash(usuario.password, saltRounds);
   }
-  const existe = await Usuario.findOne({ where: { email: usuario.email } });
-  if (existe) {
-    return res.status(409).json({
-      success: false,
-      message: "El correo ya está registrado.",
-    });
-  }
+  
 
   try {
     await user.update({

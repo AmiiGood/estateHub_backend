@@ -4,6 +4,7 @@ import {
   eliminarPropiedad,
   obtenerPropiedad,
   obtenerPropiedades,
+  obtenerPropiedadesPorUsuario,
   publicarEcommerce,
   registrarPropiedad,
   subirFotos,
