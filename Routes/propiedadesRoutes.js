@@ -35,10 +35,10 @@ propiedadesRouter.post(
   upload.array("fotos", 10),
   subirFotos
 );
-propiedadesRouter.post("/postPropiedad", verificarToken, registrarPropiedad);
-propiedadesRouter.put("/putPropiedad", verificarToken, updatePropiedad);
-propiedadesRouter.delete("/deletePropiedad/:idPropiedad",verificarToken, eliminarPropiedad);
-propiedadesRouter.put("/postEcommerce/:idPropiedad",verificarToken, publicarEcommerce);
-propiedadesRouter.get("/getPropiedadesByUsuario/:idUsuario",verificarToken, obtenerPropiedadesPorUsuario)
+propiedadesRouter.delete(
+  "/eliminarFoto/:idImagen",
+  verificarToken,
+  eliminarFoto
+);
 
 export default propiedadesRouter;

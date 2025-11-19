@@ -307,7 +307,6 @@ export const subirFotos = async (req, res) => {
   const fotos = req.files;
 
   try {
-    const baseURL = "http://localhost:3000/uploads/";
     const propiedad = await Propiedad.findByPk(idPropiedad);
 
     if (!propiedad) {
