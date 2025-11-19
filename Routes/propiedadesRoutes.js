@@ -41,4 +41,10 @@ propiedadesRouter.delete(
   eliminarFoto
 );
 
+propiedadesRouter.get(
+  "/getPropiedadesByUsuario/:idUsuario",
+  verificarToken,
+  obtenerPropiedadesPorUsuario
+);
+
 export default propiedadesRouter;
