@@ -66,13 +66,6 @@ export const updatePropiedad = async (req, res) => {
       });
     }
 
-    if (findPropiedad.idUsuario !== req.usuario.idUsuario) {
-  return res.status(403).json({
-    success: false,
-    message: "No tienes permisos para editar esta propiedad"
-  });
-}
-
 
     const updatedPropiedad = await findPropiedad.update({
       idPropiedad: propiedad.idPropiedad,
@@ -194,12 +187,6 @@ export const eliminarPropiedad = async (req, res) => {
   });
 }
 
-    if (findPropiedad.idUsuario !== req.usuario.idUsuario) {
-  return res.status(403).json({
-    success: false,
-    message: "No puedes eliminar propiedades que no son tuyas"
-  });
-}
 
 
     const deletedPropiedad = await findPropiedad.destroy();
