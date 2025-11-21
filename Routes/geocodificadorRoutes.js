@@ -1,9 +1,8 @@
 import { Router } from "express";
 import { buscadorInfo } from "../Controllers/geocodificadorController.js";
 
-
 const geocodificadorRouter = Router();
 
-geocodificadorRouter.get("getInfo", buscadorInfo);
+geocodificadorRouter.post("/getInfo", buscadorInfo);
 
 export default geocodificadorRouter;

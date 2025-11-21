@@ -1,7 +1,11 @@
+// IMPORTACIÓN DE MODULOS Y FUNCIONES NECESARIAS
+import pool from "../Config/geoConnection.js"; //// Se importa la configuración de la base de datos
+
+// FUNCIÓN PARA REALIZAR BÚSQUEDAS DE INFORMACIÓN
 export const buscadorInfo = async (req, res) => {
   try {
     // SE OBTIENEN LOS PARÁMETROS DE LA PETICIÓN
-    const input = ({ lat, long, limite, id_region } = req.body);
+    const { lat, long, limite, id_region } = req.body;
 
     // SE INICIALIZAN LOS PARÁMETROS A RETORNAR
     let params = {
@@ -14,6 +18,7 @@ export const buscadorInfo = async (req, res) => {
       codigoPostal: null,
       calle: null,
       ageb: null,
+      agebCompleto: null,
       nse: null,
       poi: null,
       denue: null,
@@ -41,7 +46,7 @@ export const buscadorInfo = async (req, res) => {
                 (SELECT ST_SetSRID( ST_Point($1, $2)::geometry, 4326) AS points, 
                 ST_INTERSECTS("SP_GEOMETRY", (ST_SetSRID( ST_Point($1, $2)::geometry, 4326))) as intersects 
                 FROM carto_region r WHERE r.id_region = ANY ($3::INT[])) as t1 WHERE intersects = true`,
-        [input.long, input.lat, idRegion]
+        [long, lat, id_region]
       );
       if (respuesta.rows[0].intersects) {
         // SE EJECUTAN CONSULTAS PARA OBTENER INFORMACIÓN DETALLADA DE LA REGIÓN, EL ESTADO, EL MUNICIPIO Y LA LOCALIDAD
@@ -208,9 +213,10 @@ export const buscadorInfo = async (req, res) => {
                         WHEN "numero" = '' THEN 'SIN NUMERO EXTERIOR'
                         ELSE "numero" 
                     END) as "numero",
-                "codigo_postal", "calle", "municipio", "estado", "region"
+                "codigo_postal", "calle", "municipio", "estado", "region", "clase"
                 FROM carto_poi
-                WHERE st_DWITHIN("SP_GEOMETRY"::geography, $1, 50) AND id_region = $2 LIMIT 1;`;
+                WHERE st_DWITHIN("SP_GEOMETRY"::geography, $1, 700) AND id_region = $2
+                ORDER BY ST_Distance("SP_GEOMETRY"::geography, $1);`;
         let poi = await pool.query(queryPoi, [
           respuesta.rows[0].points,
           params.region.id_region,
@@ -218,11 +224,32 @@ export const buscadorInfo = async (req, res) => {
         // SE VERIFICA SI EL RECIBIDO 'POI' TIENE FILAS
         if (poi.rowCount > 0) {
           // SI HAY FILAS, SE ASIGNA EL PRIMER RESULTADO A LOS PARÁMETROS Y SE INCREMENTA LA PRECISIÓN
-          params.poi = poi.rows[0];
+          params.poi = poi.rows;
           precision++;
         } else {
           // SI NO HAY FILAS, SE ASIGNA NULL A LOS PARÁMETROS
           params.poi = null;
+        }
+
+        const queryAgebCompleto = `SELECT "POLYGON_NAME", "POBTOT", "POBMAS", "POBFEM", "POB15_64", 
+                "POB65_MAS", "PEA", "POCUPADA", "PDESOCUP", "PDER_SS", "PSINDER", "P15YM_AN", "P15SEC_COM", 
+                "VPH_C_SERV", "VPH_AUTOM", "VPH_INTER", "PRO_OCUP_C", "TVIVHAB", "VIVPAR_DES", "PHOGJEF_F", 
+                "TOTHOG", "P_18A24", "P_60YMAS", "P6A11_NOA", "P12A14NOA", "PDER_IMSS", "PDER_ISTE", "VPH_CEL", 
+                "VPH_LAVAD", "VPH_REFRI" 
+                FROM carto_ageb_2020 WHERE ST_Intersects("SP_GEOMETRY", $1) AND id_region = $2 AND id_estado = $3 AND id_municipio = $4 LIMIT 1;`;
+
+        let agebCompleto = await pool.query(queryAgebCompleto, [
+          respuesta.rows[0].points,
+          params.region.id_region,
+          params.estado.id_estado,
+          params.municipio.id_municipio,
+        ]);
+
+        if (agebCompleto.rowCount > 0) {
+          params.ageb = agebCompleto.rows[0];
+          precision++;
+        } else {
+          params.ageb = null;
         }
         // SE VERIFICA SI NO HAY ERRORES
         if (!error) {
@@ -256,8 +283,10 @@ export const buscadorInfo = async (req, res) => {
   } catch (error) {
     // EN CASO DE UN ERROR, SE ENVÍA UNA RESPUESTA DE ERROR CON EL MENSAJE DE ERROR
     console.log(error);
-    sendErrorResponse(res, 500, error.message);
+
+    return res.status(500).send({
+      success: false,
+      message: "Hubo un error",
+    });
   }
 };
-
-export default { buscadorInfo };

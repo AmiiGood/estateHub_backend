@@ -1,17 +1,24 @@
 import multer from "multer";
-import path from "path";
+import { storage } from "../Config/cloudinary.js";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
   },
-  filename: (req, file, cb) => {
-    const extension = path.extname(file.originalname);
-    const newFileName = `${file.fieldname}-${Date.now()}${extension}`;
-    cb(null, newFileName);
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Tipo de archivo no permitido. Solo se aceptan imágenes JPG, PNG y WEBP"
+        ),
+        false
+      );
+    }
   },
 });
-
-const upload = multer({ storage });
 
 export default upload;

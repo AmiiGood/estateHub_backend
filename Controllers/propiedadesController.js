@@ -1,6 +1,8 @@
 import { where } from "sequelize";
+import { Op } from "sequelize";
 import { Propiedad } from "../Models/Propiedad.js";
 import { ImagenesPropiedad } from "../Models/ImagenesPropiedad.js";
+import { cloudinary } from "../Config/cloudinary.js";
 
 export const registrarPropiedad = async (req, res) => {
   const { propiedad } = req.body;
@@ -39,8 +41,9 @@ export const registrarPropiedad = async (req, res) => {
     });
 
     return res.status(200).send({
-      succes: true,
+      success: true,
       message: "Propiedad registrada",
+      data: newPropiedad,
     });
   } catch (e) {
     console.log(e);
@@ -57,6 +60,14 @@ export const updatePropiedad = async (req, res) => {
 
   try {
     const findPropiedad = await Propiedad.findByPk(propiedad.idPropiedad);
+
+    if (!findPropiedad) {
+      return res.status(404).json({
+        success: false,
+        message: "Propiedad no encontrada"
+      });
+    }
+
 
     const updatedPropiedad = await findPropiedad.update({
       idPropiedad: propiedad.idPropiedad,
@@ -86,7 +97,8 @@ export const updatePropiedad = async (req, res) => {
       cuartoServicio: propiedad.cuartoServicio,
       muebles: propiedad.muebles,
       credito: propiedad.credito,
-      publicarEcommerce: propiedad.publicadoEcommerce,
+      publicadoEcommerce: propiedad.publicadoEcommerce,
+
     });
 
     return res.status(200).send({
@@ -104,7 +116,44 @@ export const updatePropiedad = async (req, res) => {
 
 export const obtenerPropiedades = async (req, res) => {
   try {
-    const propiedades = await Propiedad.findAll();
+    const {
+      ciudad,
+      estado,
+      tipoPropiedad,
+      precioMin,
+      precioMax,
+      habitaciones,
+      banios,
+      publicadoEcommerce,
+    } = req.query;
+
+    const where = {};
+
+    if (ciudad) where.ciudad = ciudad;
+    if (estado) where.estado = estado;
+    if (tipoPropiedad) where.tipoPropiedad = tipoPropiedad;
+
+    if (precioMin || precioMax) {
+      where.precioVenta = {};
+      if (precioMin) where.precioVenta[Op.gte] = precioMin;
+      if (precioMax) where.precioVenta[Op.lte] = precioMax;
+    }
+
+    if (habitaciones) where.numHabitaciones = habitaciones;
+    if (banios) where.numBanios = banios;
+
+    if (publicadoEcommerce !== undefined)
+      where.publicadoEcommerce = publicadoEcommerce === "true";
+
+    const propiedades = await Propiedad.findAll({
+      where,
+      include: [
+        {
+          model: ImagenesPropiedad,
+          as: "imagenes",
+        },
+      ],
+    });
 
     return res.status(200).json({
       success: true,
@@ -131,7 +180,14 @@ export const obtenerPropiedad = async (req, res) => {
   }
 
   try {
-    const propiedad = await Propiedad.findByPk(idPropiedad);
+    const propiedad = await Propiedad.findByPk(idPropiedad, {
+      include: [
+        {
+          model: ImagenesPropiedad,
+          as: "imagenes",
+        },
+      ],
+    });
 
     if (propiedad == null) {
       return res.status(444).send({
@@ -156,6 +212,14 @@ export const eliminarPropiedad = async (req, res) => {
   const { idPropiedad } = req.params;
   try {
     const findPropiedad = await Propiedad.findByPk(idPropiedad);
+    if (!findPropiedad) {
+  return res.status(404).json({
+    success: false,
+    message: "Propiedad no encontrada"
+  });
+}
+
+
 
     const deletedPropiedad = await findPropiedad.destroy();
 
@@ -198,41 +262,117 @@ export const publicarEcommerce = async (req, res) => {
     });
   }
 };
+export const obtenerPropiedadesPorUsuario = async (req, res) => {
+  const { idUsuario } = req.params;
+  try {
+    const propiedades = await Propiedad.findAll({
+      include: [
+        {
+          model: ImagenesPropiedad,
+          as: "imagenes",
+        },
+      ],
+      where: { idUsuario },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: propiedades,
+      count: propiedades.length,
+    });
+  } catch (e) {
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener propiedades del usuario",
+      error: e.message,
+    });
+  }
+};
 
 export const subirFotos = async (req, res) => {
   const { idPropiedad } = req.params;
   const fotos = req.files;
+
   try {
-    const baseURL = `http://localhost:3000/uploads/`;
     const propiedad = await Propiedad.findByPk(idPropiedad);
+
     if (!propiedad) {
       return res.status(404).send({
         success: false,
         message: "Propiedad no encontrada",
       });
     }
-    console.log(fotos);
+
+    if (!fotos || fotos.length === 0) {
+      return res.status(400).send({
+        success: false,
+        message: "No se han enviado archivos",
+      });
+    }
+
     const fotosSubidas = [];
+
     for (let foto of fotos) {
       const uploadedFoto = await ImagenesPropiedad.create({
         idPropiedad: propiedad.idPropiedad,
-        urlImagen: baseURL + foto.filename,
-        esPrincipal: false,
+        urlImagen: foto.path,
         fechaSubida: Date.now(),
       });
 
-      fotosSubidas.push(uploadedFoto);
+      fotosSubidas.push({
+        id: uploadedFoto.idImagen,
+        url: foto.path,
+        publicId: foto.filename,
+      });
     }
 
     return res.status(200).send({
       success: true,
-      message: "Fotos subidas",
+      message: "Fotos subidas exitosamente",
       fotos: fotosSubidas,
     });
   } catch (e) {
+    console.log(e);
     return res.status(500).send({
       success: false,
-      data: "Error al subir fotos",
+      message: "Error al subir fotos",
+      error: e.message,
+    });
+  }
+};
+
+export const eliminarFoto = async (req, res) => {
+  const { idImagen } = req.params;
+
+  try {
+    const imagen = await ImagenesPropiedad.findByPk(idImagen);
+
+    if (!imagen) {
+      return res.status(404).send({
+        success: false,
+        message: "Imagen no encontrada",
+      });
+    }
+
+    const urlParts = imagen.urlImagen.split("/");
+    const publicIdWithExtension = urlParts[urlParts.length - 1];
+    const publicId = `estatehub/propiedades/${
+      publicIdWithExtension.split(".")[0]
+    }`;
+
+    await cloudinary.uploader.destroy(publicId);
+
+    await imagen.destroy();
+
+    return res.status(200).send({
+      success: true,
+      message: "Imagen eliminada exitosamente",
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      success: false,
+      message: "Error al eliminar imagen",
       error: e.message,
     });
   }
