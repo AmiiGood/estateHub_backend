@@ -20,7 +20,7 @@ export const crearCita = async (req, res) => {
       });
     }
 
-    if (!usuario.estatus) {
+    if (!usuario.activo) {
       return res.status(403).send({
         success: false,
         message: "No se puede crear una cita con un usuario inactivo",
@@ -91,7 +91,7 @@ export const actualizarCita = async (req, res) => {
         });
       }
 
-      if (!usuario.estatus) {
+      if (!usuario.activo) {
         return res.status(403).send({
           success: false,
           message: "No se puede asignar una cita a un usuario inactivo",
