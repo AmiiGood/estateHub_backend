@@ -110,6 +110,7 @@ const verificarDisponibilidad = async (
 export const crearCita = async (req, res) => {
   const { cita } = req.body;
   try {
+    await actualizarCitasVencidas();
     // Validar que la propiedad existe
     const propiedad = await Propiedad.findByPk(cita.idPropiedad);
     if (!propiedad) {
@@ -167,7 +168,6 @@ export const crearCita = async (req, res) => {
       });
     }
 
-    // Verificar que el usuario no tenga mas de 3 citas pendientes
     const citasPendientes = await Cita.count({
       where: {
         idUsuario: cita.idUsuario,
@@ -178,10 +178,10 @@ export const crearCita = async (req, res) => {
       },
     });
 
-    if (citasPendientes >= 3) {
+    if (citasPendientes >= 10) {
       return res.status(400).send({
         success: false,
-        message: "No puedes tener mas de 3 citas pendientes al mismo tiempo",
+        message: "No puedes tener más de 10 citas pendientes al mismo tiempo",
       });
     }
 
@@ -189,7 +189,7 @@ export const crearCita = async (req, res) => {
     const nuevaCita = await Cita.create({
       idPropiedad: cita.idPropiedad,
       idUsuario: cita.idUsuario,
-      fecha: new Date(cita.fecha),
+      fecha: new Date(cita.fecha + "Z"),
       estatus: cita.estatus || "en_proceso",
     });
 
@@ -287,7 +287,7 @@ export const actualizarCita = async (req, res) => {
     await findCita.update({
       idPropiedad: cita.idPropiedad,
       idUsuario: cita.idUsuario,
-      fecha: cita.fecha ? new Date(cita.fecha) : findCita.fecha,
+      fecha: cita.fecha ? new Date(cita.fecha + "Z") : findCita.fecha,
       estatus: cita.estatus,
     });
 
@@ -315,10 +315,11 @@ export const obtenerHorariosDisponibles = async (req, res) => {
       });
     }
 
-    const fechaConsulta = new Date(fecha + "T00:00:00");
+    // CAMBIO 1: Crear la fecha en UTC explícitamente
+    const fechaConsulta = new Date(fecha + "T00:00:00.000Z");
 
     const finDia = new Date(fechaConsulta);
-    finDia.setDate(finDia.getDate() + 1);
+    finDia.setUTCDate(finDia.getUTCDate() + 1);
     finDia.setMilliseconds(-1);
 
     console.log("Buscando citas entre:", fechaConsulta, "y", finDia);
@@ -338,9 +339,6 @@ export const obtenerHorariosDisponibles = async (req, res) => {
     });
 
     console.log("Citas encontradas:", citasDelDia.length);
-    citasDelDia.forEach((c) => {
-      console.log("Cita:", c.idCita, "Fecha:", c.fecha);
-    });
 
     const horariosOcupados = new Set();
 
@@ -357,13 +355,23 @@ export const obtenerHorariosDisponibles = async (req, res) => {
       );
     });
 
-    // Generar todos los horarios posibles
+    // CAMBIO 2: Generar horarios usando UTC correctamente
     const horariosDisponibles = [];
 
     for (let hora = 8; hora < 20; hora++) {
       for (let minuto of [0, 30]) {
-        const horario = new Date(fechaConsulta);
-        horario.setHours(hora, minuto, 0, 0);
+        // Crear el horario directamente en UTC con la fecha correcta
+        const horario = new Date(
+          Date.UTC(
+            fechaConsulta.getUTCFullYear(),
+            fechaConsulta.getUTCMonth(),
+            fechaConsulta.getUTCDate(),
+            hora,
+            minuto,
+            0,
+            0
+          )
+        );
 
         const timestamp = horario.getTime();
 
@@ -823,5 +831,24 @@ export const actualizarEstatusCita = async (req, res) => {
       message: "Error al actualizar estatus de la cita",
       error: e.message,
     });
+  }
+};
+
+const actualizarCitasVencidas = async () => {
+  try {
+    const ahora = new Date();
+    await Cita.update(
+      { estatus: "completada" },
+      {
+        where: {
+          estatus: "en_proceso",
+          fecha: {
+            [Op.lt]: ahora,
+          },
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error al actualizar citas vencidas:", error);
   }
 };
