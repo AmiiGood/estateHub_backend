@@ -1,9 +1,117 @@
 import { Cita, Propiedad, Usuario } from "../Models/Asociaciones.js";
 import { Op } from "sequelize";
 
+//Funciones auxiliares de validacion
+const validarFechaYHoraCita = (fecha) => {
+  const fechaCita = new Date(fecha);
+  const ahora = new Date();
+
+  // Validar que la fecha no sea en el pasado
+  if (fechaCita < ahora) {
+    return {
+      valida: false,
+      mensaje: "No se puede agendar una cita en una fecha pasada",
+    };
+  }
+
+  // Validar que no sea el mismo dia
+  const mañana = new Date(ahora);
+  mañana.setDate(mañana.getDate() + 1);
+  mañana.setHours(0, 0, 0, 0);
+
+  if (fechaCita < mañana) {
+    return {
+      valida: false,
+      mensaje: "Las citas deben agendarse con al menos 1 dia de anticipacion",
+    };
+  }
+
+  // Validar horario(8:00 AM - 8:00 PM)
+  const hora = fechaCita.getHours();
+  const minutos = fechaCita.getMinutes();
+
+  if (hora < 8 || hora >= 20) {
+    return {
+      valida: false,
+      mensaje:
+        "Las citas solo pueden agendarse entre las 8:00 AM y las 8:00 PM",
+    };
+  }
+
+  // Validar que los minutos sean 00 o 30
+  if (minutos !== 0 && minutos !== 30) {
+    return {
+      valida: false,
+      mensaje:
+        "Las citas solo pueden agendarse en intervalos de 30 minutos (:00 o :30)",
+    };
+  }
+
+  // Validar que no sea domingo
+  const diaSemana = fechaCita.getDay();
+  if (diaSemana === 0) {
+    return {
+      valida: false,
+      mensaje: "No se pueden agendar citas los domingos",
+    };
+  }
+
+  // Validar que no sea mas de 3 meses en el futuro
+  const tresMesesAdelante = new Date(ahora);
+  tresMesesAdelante.setMonth(tresMesesAdelante.getMonth() + 3);
+
+  if (fechaCita > tresMesesAdelante) {
+    return {
+      valida: false,
+      mensaje:
+        "Las citas no pueden agendarse con mas de 3 meses de anticipacion",
+    };
+  }
+
+  return { valida: true };
+};
+
+const verificarDisponibilidad = async (
+  idPropiedad,
+  fecha,
+  idCitaActual = null
+) => {
+  const fechaCita = new Date(fecha);
+
+  // Buscar si ya existe una cita en ese horario para esa propiedad
+  const whereClause = {
+    idPropiedad,
+    fecha: fechaCita,
+    estatus: {
+      [Op.ne]: "cancelada",
+    },
+  };
+
+  if (idCitaActual) {
+    whereClause.idCita = {
+      [Op.ne]: idCitaActual,
+    };
+  }
+
+  const citaExistente = await Cita.findOne({
+    where: whereClause,
+  });
+
+  if (citaExistente) {
+    return {
+      disponible: false,
+      mensaje: "Ya existe una cita agendada para esta propiedad en ese horario",
+    };
+  }
+
+  return { disponible: true };
+};
+
 export const crearCita = async (req, res) => {
   const { cita } = req.body;
   try {
+    await actualizarCitasVencidas();
+    // Validar que la propiedad existe
     const propiedad = await Propiedad.findByPk(cita.idPropiedad);
     if (!propiedad) {
       return res.status(404).send({
@@ -12,6 +120,7 @@ export const crearCita = async (req, res) => {
       });
     }
 
+    // Validar que el usuario existe
     const usuario = await Usuario.findByPk(cita.idUsuario);
     if (!usuario) {
       return res.status(404).send({
@@ -20,13 +129,15 @@ export const crearCita = async (req, res) => {
       });
     }
 
-    if (!usuario.estatus) {
+    // Validar que el usuario este activo
+    if (!usuario.activo) {
       return res.status(403).send({
         success: false,
         message: "No se puede crear una cita con un usuario inactivo",
       });
     }
 
+    // Validar que el dueño no agende cita en su propia propiedad
     if (propiedad.idUsuario === cita.idUsuario) {
       return res.status(400).send({
         success: false,
@@ -35,10 +146,50 @@ export const crearCita = async (req, res) => {
       });
     }
 
+    // Validar fecha y horario
+    const validacionFecha = validarFechaYHoraCita(cita.fecha);
+    if (!validacionFecha.valida) {
+      return res.status(400).send({
+        success: false,
+        message: validacionFecha.mensaje,
+      });
+    }
+
+    // Verificar disponibilidad del horario
+    const disponibilidad = await verificarDisponibilidad(
+      cita.idPropiedad,
+      cita.fecha
+    );
+
+    if (!disponibilidad.disponible) {
+      return res.status(409).send({
+        success: false,
+        message: disponibilidad.mensaje,
+      });
+    }
+
+    const citasPendientes = await Cita.count({
+      where: {
+        idUsuario: cita.idUsuario,
+        estatus: "en_proceso",
+        fecha: {
+          [Op.gte]: new Date(),
+        },
+      },
+    });
+
+    if (citasPendientes >= 10) {
+      return res.status(400).send({
+        success: false,
+        message: "No puedes tener más de 10 citas pendientes al mismo tiempo",
+      });
+    }
+
+    // Crear la cita
     const nuevaCita = await Cita.create({
       idPropiedad: cita.idPropiedad,
       idUsuario: cita.idUsuario,
-      fecha: new Date(cita.fecha),
+      fecha: new Date(cita.fecha + "Z"),
       estatus: cita.estatus || "en_proceso",
     });
 
@@ -91,7 +242,7 @@ export const actualizarCita = async (req, res) => {
         });
       }
 
-      if (!usuario.estatus) {
+      if (!usuario.activo) {
         return res.status(403).send({
           success: false,
           message: "No se puede asignar una cita a un usuario inactivo",
@@ -107,10 +258,36 @@ export const actualizarCita = async (req, res) => {
       }
     }
 
+    // Si se esta actualizando la fecha, validar
+    if (cita.fecha) {
+      const validacionFecha = validarFechaYHoraCita(cita.fecha);
+      if (!validacionFecha.valida) {
+        return res.status(400).send({
+          success: false,
+          message: validacionFecha.mensaje,
+        });
+      }
+
+      // Verificar disponibilidad (excluyendo la cita actual)
+      const idPropiedadFinal = cita.idPropiedad || findCita.idPropiedad;
+      const disponibilidad = await verificarDisponibilidad(
+        idPropiedadFinal,
+        cita.fecha,
+        cita.idCita
+      );
+
+      if (!disponibilidad.disponible) {
+        return res.status(409).send({
+          success: false,
+          message: disponibilidad.mensaje,
+        });
+      }
+    }
+
     await findCita.update({
       idPropiedad: cita.idPropiedad,
       idUsuario: cita.idUsuario,
-      fecha: cita.fecha ? new Date(cita.fecha) : findCita.fecha,
+      fecha: cita.fecha ? new Date(cita.fecha + "Z") : findCita.fecha,
       estatus: cita.estatus,
     });
 
@@ -122,6 +299,111 @@ export const actualizarCita = async (req, res) => {
     return res.status(500).send({
       success: false,
       message: "Error al actualizar cita",
+      error: e.message,
+    });
+  }
+};
+
+export const obtenerHorariosDisponibles = async (req, res) => {
+  const { idPropiedad, fecha } = req.query;
+
+  try {
+    if (!idPropiedad || !fecha) {
+      return res.status(400).send({
+        success: false,
+        message: "Se requiere idPropiedad y fecha",
+      });
+    }
+
+    // CAMBIO 1: Crear la fecha en UTC explícitamente
+    const fechaConsulta = new Date(fecha + "T00:00:00.000Z");
+
+    const finDia = new Date(fechaConsulta);
+    finDia.setUTCDate(finDia.getUTCDate() + 1);
+    finDia.setMilliseconds(-1);
+
+    console.log("Buscando citas entre:", fechaConsulta, "y", finDia);
+
+    // Obtener todas las citas de ese dia para esa propiedad
+    const citasDelDia = await Cita.findAll({
+      where: {
+        idPropiedad,
+        fecha: {
+          [Op.gte]: fechaConsulta,
+          [Op.lt]: finDia,
+        },
+        estatus: {
+          [Op.ne]: "cancelada",
+        },
+      },
+    });
+
+    console.log("Citas encontradas:", citasDelDia.length);
+
+    const horariosOcupados = new Set();
+
+    citasDelDia.forEach((c) => {
+      const fechaCita = new Date(c.fecha);
+      fechaCita.setSeconds(0, 0);
+      const timestamp = fechaCita.getTime();
+      horariosOcupados.add(timestamp);
+      console.log(
+        "Horario ocupado:",
+        fechaCita.toISOString(),
+        "Timestamp:",
+        timestamp
+      );
+    });
+
+    // CAMBIO 2: Generar horarios usando UTC correctamente
+    const horariosDisponibles = [];
+
+    for (let hora = 8; hora < 20; hora++) {
+      for (let minuto of [0, 30]) {
+        // Crear el horario directamente en UTC con la fecha correcta
+        const horario = new Date(
+          Date.UTC(
+            fechaConsulta.getUTCFullYear(),
+            fechaConsulta.getUTCMonth(),
+            fechaConsulta.getUTCDate(),
+            hora,
+            minuto,
+            0,
+            0
+          )
+        );
+
+        const timestamp = horario.getTime();
+
+        // Verificar si este horario esta ocupado
+        const estaOcupado = horariosOcupados.has(timestamp);
+
+        if (!estaOcupado) {
+          horariosDisponibles.push({
+            fecha: horario.toISOString(),
+            horaLocal: `${hora.toString().padStart(2, "0")}:${minuto
+              .toString()
+              .padStart(2, "0")}`,
+            disponible: true,
+          });
+        } else {
+          console.log(`Horario ${hora}:${minuto} esta ocupado`);
+        }
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      fecha: fecha,
+      totalCitas: citasDelDia.length,
+      data: horariosDisponibles,
+      count: horariosDisponibles.length,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      success: false,
+      message: "Error al obtener horarios disponibles",
       error: e.message,
     });
   }
@@ -530,7 +812,7 @@ export const actualizarEstatusCita = async (req, res) => {
     if (estatus && !estatusValidos.includes(estatus.toLowerCase())) {
       return res.status(400).send({
         success: false,
-        message: `Estatus no válido. Los estatus válidos son: ${estatusValidos.join(
+        message: `Estatus no valido. Los estatus validos son: ${estatusValidos.join(
           ", "
         )}`,
       });
@@ -549,5 +831,24 @@ export const actualizarEstatusCita = async (req, res) => {
       message: "Error al actualizar estatus de la cita",
       error: e.message,
     });
+  }
+};
+
+const actualizarCitasVencidas = async () => {
+  try {
+    const ahora = new Date();
+    await Cita.update(
+      { estatus: "completada" },
+      {
+        where: {
+          estatus: "en_proceso",
+          fecha: {
+            [Op.lt]: ahora,
+          },
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error al actualizar citas vencidas:", error);
   }
 };

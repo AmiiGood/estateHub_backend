@@ -4,6 +4,7 @@ import {
   eliminarPropiedad,
   obtenerPropiedad,
   obtenerPropiedades,
+  obtenerPropiedadesPorUsuario,
   publicarEcommerce,
   registrarPropiedad,
   subirFotos,
@@ -38,6 +39,12 @@ propiedadesRouter.delete(
   "/eliminarFoto/:idImagen",
   verificarToken,
   eliminarFoto
+);
+
+propiedadesRouter.get(
+  "/getPropiedadesByUsuario/:idUsuario",
+  verificarToken,
+  obtenerPropiedadesPorUsuario
 );
 
 export default propiedadesRouter;
