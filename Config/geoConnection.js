@@ -9,7 +9,7 @@ const port = process.env.PORT;
 const pool = new Pool({
   host: host,
   user: user,
-  password: `${password}`,
+  password: password,
   database: database,
   port: port,
 });

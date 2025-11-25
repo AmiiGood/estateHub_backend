@@ -13,12 +13,6 @@ const databaseConnection = new Sequelize(databaseg, userg, passwordg, {
   host: hostg,
   dialect: "postgres",
   port: portg,
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
   logging: false,
 });
 
