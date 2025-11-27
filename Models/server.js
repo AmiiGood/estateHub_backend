@@ -26,21 +26,22 @@ import loginRouter from "../Routes/loginRoutes.js";
 export class Server {
   constructor() {
     this.app = express();
-    this.port = 3000;
-    this.connection();
+    this.port = process.env.PORT || 3000;
     this.middlewares();
     this.routes();
+    this.connection();
   }
 
   middlewares() {
     this.app.use(cors());
     this.app.use(express.json());
-    //this.app.use("/uploads", express.static("uploads"));
   }
 
   async connection() {
     try {
       await databaseConnection.authenticate();
+      console.log("Conexión Sequelize establecida");
+
       await Usuario.sync();
       await Propiedad.sync();
       await Contrato.sync();
@@ -49,12 +50,13 @@ export class Server {
       await Cita.sync();
       await Notificacion.sync();
       await ImagenesPropiedad.sync();
-      console.log("Conectado");
+      console.log("Modelos sincronizados");
 
-      await pool;
-      console.log("GeoConectado");
+      await pool.query("SELECT NOW()");
+      console.log("Pool de PostgreSQL conectado");
     } catch (e) {
-      console.log(e);
+      console.error("✗ Error en conexión:", e.message);
+      throw e;
     }
   }
 
@@ -68,13 +70,32 @@ export class Server {
     this.app.use("/api/contratos", contratosRouter);
     this.app.use("/api/pagosRenta", pagosRentaRouter);
     this.app.use("/api/gastosMantenimiento", gastosMantenimientoRouter);
-
     this.app.use("/api/login", loginRouter);
+
+    // Ruta de health check
+    this.app.get("/health", (req, res) => {
+      res.json({ status: "ok", timestamp: new Date() });
+    });
   }
 
-  startServer() {
-    this.app.listen(this.port, "0.0.0.0", () => {
-      console.log(`Servidor corriendo en el puerto ${this.port}`);
-    });
+  async startServer() {
+    try {
+      // Esperar a que la conexión esté lista
+      await this.connection();
+
+      this.app.listen(this.port, "0.0.0.0", () => {
+        console.log(`
+╔════════════════════════════════════════╗
+║  🚀 Servidor corriendo exitosamente   ║
+║  📡 Puerto: ${this.port}                      ║
+║  🌐 Host: 0.0.0.0                      ║
+║  📅 ${new Date().toLocaleString()}     ║
+╚════════════════════════════════════════╝
+        `);
+      });
+    } catch (error) {
+      console.error("✗ Error al iniciar servidor:", error);
+      process.exit(1);
+    }
   }
 }
