@@ -14,7 +14,6 @@ export const Contrato = databaseConnection.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        //Nombre de la tabla
         model: "propiedades",
         key: "idPropiedad",
       },
@@ -61,13 +60,10 @@ export const Contrato = databaseConnection.define(
     },
   },
   {
-    //Esto crea automaticamente createdAt y updatedAt
     timestamps: true,
     createdAt: "fechaCreacion",
     updatedAt: false,
-    //Forzar nombre con el que se declara
     freezeTableName: true,
-    //Implementa eliminacion logica
     paranoid: true,
   }
 );

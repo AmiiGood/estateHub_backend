@@ -29,6 +29,7 @@ export const getAllUsuarios = async (req, res) => {
 };
 
 export const getUsuario = async (req, res) => {
+  console.log("Llego la request");
   const { idUsuario } = req.params;
   if (!idUsuario) {
     return res.status(404).send({
