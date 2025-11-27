@@ -129,7 +129,6 @@ export const crearCita = async (req, res) => {
       });
     }
 
-    // Validar que el usuario este activo
     if (!usuario.activo) {
       return res.status(403).send({
         success: false,

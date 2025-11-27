@@ -13,6 +13,9 @@ const databaseConnection = new Sequelize(databaseg, userg, passwordg, {
   host: hostg,
   dialect: "postgres",
   port: portg,
+  ssl: {
+    rejectUnauthorized: false,
+  },
   logging: false,
 });
 
