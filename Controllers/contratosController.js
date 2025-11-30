@@ -4,11 +4,24 @@ import {
   Propiedad,
   PagoRenta,
 } from "../Models/Asociaciones.js";
+import uploadDocument from "../Helpers/uploadDocument.js";
+
+export const uploadContratoDoc = uploadDocument.single("documento");
 
 export const registrarContrato = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send({
+      success: false,
+      message: "Debe subir un documento del contrato",
+    });
+  }
+
   const { contrato } = req.body;
+  
   try {
-    const propiedad = await Propiedad.findByPk(contrato.idPropiedad);
+    const contratoData = typeof contrato === 'string' ? JSON.parse(contrato) : contrato;
+    
+    const propiedad = await Propiedad.findByPk(contratoData.idPropiedad);
     if (!propiedad) {
       return res.status(404).send({
         success: false,
@@ -16,7 +29,7 @@ export const registrarContrato = async (req, res) => {
       });
     }
 
-    const usuario = await Usuario.findByPk(contrato.idUsuario);
+    const usuario = await Usuario.findByPk(contratoData.idUsuario);
     if (!usuario) {
       return res.status(404).send({
         success: false,
@@ -31,7 +44,7 @@ export const registrarContrato = async (req, res) => {
       });
     }
 
-    if (new Date(contrato.fechaFin) <= new Date(contrato.fechaInicio)) {
+    if (new Date(contratoData.fechaFin) <= new Date(contratoData.fechaInicio)) {
       return res.status(400).send({
         success: false,
         message: "La fecha de fin debe ser posterior a la fecha de inicio",
@@ -39,13 +52,13 @@ export const registrarContrato = async (req, res) => {
     }
 
     const nuevoContrato = await Contrato.create({
-      idPropiedad: contrato.idPropiedad,
-      idUsuario: contrato.idUsuario,
-      urlDoc: contrato.urlDoc,
-      fechaInicio: contrato.fechaInicio,
-      fechaFin: contrato.fechaFin,
-      montoMensual: contrato.montoMensual,
-      deposito: contrato.deposito,
+      idPropiedad: contratoData.idPropiedad,
+      idUsuario: contratoData.idUsuario,
+      urlDoc: req.file.path, 
+      fechaInicio: contratoData.fechaInicio,
+      fechaFin: contratoData.fechaFin,
+      montoMensual: contratoData.montoMensual,
+      deposito: contratoData.deposito,
     });
 
     return res.status(200).send({
