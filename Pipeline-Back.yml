@@ -1,0 +1,28 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: "Instalar Node.js"
+
+  - script: npm install
+    displayName: "Instalar dependencias"
+
+  - script: npm test
+    displayName: "Ejecutar pruebas"
+
+  - script: npm run build
+    displayName: "Build del proyecto"
+    condition: exists('package.json')
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: 'dist'
+      ArtifactName: 'backend-dist'
+      publishLocation: 'Container'
+    displayName: "Publicar artefactos"
