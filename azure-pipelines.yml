@@ -3,30 +3,32 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 trigger:
-  - main
+- main
 
 pool:
   name: Default
-  demands: Agent.Name -equals ZURI
+  demands:
+  - Agent.Name -equals ZURI
 
 steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '18.x'
-    displayName: "Instalar Node.js"
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: "Instalar Node.js"
 
-  - script: npm install
-    displayName: "Instalar dependencias"
+- script: npm install
+  displayName: "Instalar dependencias"
 
-  - script: npm test
-    displayName: "Ejecutar pruebas"
+- script: npm test
+  displayName: "Ejecutar pruebas"
 
-  - script: npm run build
-    displayName: "Build del proyecto"
+- script: npm run build
+  displayName: "Build del proyecto"
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: 'dist'
-      ArtifactName: 'backend-dist'
-      publishLocation: 'Container'
-    displayName: "Publicar artefactos"
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'dist'
+    ArtifactName: 'backend-dist'
+    publishLocation: 'Container'
+  displayName: "Publicar artefactos"
+
