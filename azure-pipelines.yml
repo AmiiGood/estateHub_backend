@@ -19,16 +19,15 @@ steps:
 - script: npm install
   displayName: "Instalar dependencias"
 
-- script: echo "No hay pruebas configuradas"
-  displayName: "Omitir pruebas"
+# SALTAMOS npm test porque no tienes tests
+# Puedes agregarlo después cuando los tengas
 
-- script: npm run build
-  displayName: "Build del proyecto"
+- script: echo "No hay proceso de build para este backend"
+  displayName: "Build (no requerido)"
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'dist'
-    ArtifactName: 'backend-dist'
+    PathtoPublish: '.'
+    ArtifactName: 'backend-source'
     publishLocation: 'Container'
-  displayName: "Publicar artefactos"
-
+  displayName: "Publicar código fuente"
