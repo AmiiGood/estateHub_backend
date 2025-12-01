@@ -4,7 +4,7 @@ const host = process.env.HOST;
 const user = process.env.USER;
 const password = process.env.PASSWORD;
 const database = process.env.DATABASE;
-const port = process.env.PORT;
+const port = process.env.PORTGEO;
 
 const pool = new Pool({
   host: host,
@@ -12,6 +12,9 @@ const pool = new Pool({
   password: password,
   database: database,
   port: port,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 pool.connect((err, res) => {

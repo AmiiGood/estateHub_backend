@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { Pool } from "pg";
 import { Sequelize } from "sequelize";
 
 const hostg = process.env.HOSTG;
@@ -13,6 +12,9 @@ const databaseConnection = new Sequelize(databaseg, userg, passwordg, {
   host: hostg,
   dialect: "postgres",
   port: portg,
+  ssl: {
+    rejectUnauthorized: false,
+  },
   logging: false,
 });
 

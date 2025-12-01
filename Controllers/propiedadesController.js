@@ -290,6 +290,8 @@ export const obtenerPropiedadesPorUsuario = async (req, res) => {
 };
 
 export const subirFotos = async (req, res) => {
+  console.log("Headers recibidos:", req.headers);
+
   const { idPropiedad } = req.params;
   const fotos = req.files;
 

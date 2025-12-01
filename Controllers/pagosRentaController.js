@@ -22,7 +22,7 @@ export const registrarPagoRenta = async (req, res) => {
       });
     }
 
-    if (!contrato.usuario.estatus) {
+    if (!contrato.usuario.activo) {
       return res.status(403).send({
         success: false,
         message:
@@ -87,7 +87,7 @@ export const updatePagoRenta = async (req, res) => {
         });
       }
 
-      if (!nuevoContrato.usuario.estatus) {
+      if (!nuevoContrato.usuario.activo) {
         return res.status(403).send({
           success: false,
           message:

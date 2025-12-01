@@ -121,19 +121,28 @@ export const editarUsuario = async (req, res) => {
     const saltRounds = 10;
     passwordHash = await bcrypt.hash(usuario.password, saltRounds);
   }
-  
 
   try {
-    await user.update({
+    // Preparar los datos a actualizar
+    const datosActualizacion = {
       email: usuario.email,
       passwordHash: passwordHash,
       nombre: usuario.nombre,
       apellidoPaterno: usuario.apellidoPaterno,
       apellidoMaterno: usuario.apellidoMaterno,
       telefono: usuario.telefono,
-    });
+    };
+
+
+    if (usuario.activo !== undefined) {
+      datosActualizacion.activo = usuario.activo;
+    }
+
+    await user.update(datosActualizacion);
+    
     return res.status(200).send({
       message: "Usuario editado exitosamente",
+      data: user
     });
   } catch (e) {
     console.log(e);
