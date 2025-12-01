@@ -24,4 +24,13 @@ const storage = new CloudinaryStorage({
   },
 });
 
-export { cloudinary, storage };
+const documentStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "estatehub/contratos",
+    allowed_formats: ["pdf", "doc", "docx"],
+    resource_type: "raw", // Importante para documentos
+  },
+});
+
+export { cloudinary, storage, documentStorage };

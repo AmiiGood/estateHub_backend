@@ -8,6 +8,7 @@ import {
   obtenerContratosPorPropiedad,
   obtenerContratosActivos,
   actualizarEstatusContrato,
+  uploadContratoDoc,
 } from "../Controllers/contratosController.js";
 import { verificarToken } from "../Middlewares/auth.js";
 
@@ -25,8 +26,8 @@ contratosRouter.get(
   verificarToken,
   obtenerContratosPorPropiedad
 );
-contratosRouter.post("/postContrato",verificarToken, registrarContrato);
-contratosRouter.put("/putContrato",verificarToken, updateContrato);
+contratosRouter.post("/postContrato", verificarToken, uploadContratoDoc, registrarContrato);
+contratosRouter.put("/putContrato",verificarToken, uploadContratoDoc, updateContrato);
 contratosRouter.put(
   "/putEstatusContrato/:idContrato",
   verificarToken,
