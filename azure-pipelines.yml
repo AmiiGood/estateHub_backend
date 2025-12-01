@@ -6,7 +6,8 @@ trigger:
   - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Default
+  demands: Agent.Name -equals ZURI
 
 steps:
   - task: NodeTool@0
@@ -22,7 +23,6 @@ steps:
 
   - script: npm run build
     displayName: "Build del proyecto"
-    condition: exists('package.json')
 
   - task: PublishBuildArtifacts@1
     inputs:
