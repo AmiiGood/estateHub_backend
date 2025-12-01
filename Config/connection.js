@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { Pool } from "pg";
 import { Sequelize } from "sequelize";
 
 const hostg = process.env.HOSTG;
