@@ -27,7 +27,7 @@ contratosRouter.get(
   obtenerContratosPorPropiedad
 );
 contratosRouter.post("/postContrato", verificarToken, uploadContratoDoc, registrarContrato);
-contratosRouter.put("/putContrato",verificarToken, updateContrato);
+contratosRouter.put("/putContrato",verificarToken, uploadContratoDoc, updateContrato);
 contratosRouter.put(
   "/putEstatusContrato/:idContrato",
   verificarToken,

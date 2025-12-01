@@ -51,10 +51,14 @@ export const registrarContrato = async (req, res) => {
       });
     }
 
+    // Para documentos en Cloudinary, necesitamos construir la URL correctamente
+    // req.file.path contiene la URL pero puede necesitar ajuste
+    const documentUrl = req.file.path;
+
     const nuevoContrato = await Contrato.create({
       idPropiedad: contratoData.idPropiedad,
       idUsuario: contratoData.idUsuario,
-      urlDoc: req.file.path, 
+      urlDoc: documentUrl, 
       fechaInicio: contratoData.fechaInicio,
       fechaFin: contratoData.fechaFin,
       montoMensual: contratoData.montoMensual,
@@ -79,7 +83,9 @@ export const registrarContrato = async (req, res) => {
 export const updateContrato = async (req, res) => {
   const { contrato } = req.body;
   try {
-    const findContrato = await Contrato.findByPk(contrato.idContrato);
+    const contratoData = typeof contrato === 'string' ? JSON.parse(contrato) : contrato;
+    
+    const findContrato = await Contrato.findByPk(contratoData.idContrato);
 
     if (!findContrato) {
       return res.status(404).send({
@@ -88,15 +94,15 @@ export const updateContrato = async (req, res) => {
       });
     }
     
-    if (contrato.idUsuario && contrato.idUsuario !== findContrato.idUsuario) {
-      const nuevoUsuario = await Usuario.findByPk(contrato.idUsuario);
+    if (contratoData.idUsuario && contratoData.idUsuario !== findContrato.idUsuario) {
+      const nuevoUsuario = await Usuario.findByPk(contratoData.idUsuario);
       if (!nuevoUsuario) {
         return res.status(404).send({
           success: false,
           message: "Usuario no encontrado",
         });
       }
-      if (!nuevoUsuario.estatus) {
+      if (!nuevoUsuario.activo) {
         return res.status(403).send({
           success: false,
           message: "No se puede asignar un usuario inactivo al contrato",
@@ -104,8 +110,8 @@ export const updateContrato = async (req, res) => {
       }
     }
 
-    const nuevaFechaInicio = contrato.fechaInicio || findContrato.fechaInicio;
-    const nuevaFechaFin = contrato.fechaFin || findContrato.fechaFin;
+    const nuevaFechaInicio = contratoData.fechaInicio || findContrato.fechaInicio;
+    const nuevaFechaFin = contratoData.fechaFin || findContrato.fechaFin;
 
     if (new Date(nuevaFechaFin) <= new Date(nuevaFechaInicio)) {
       return res.status(400).send({
@@ -114,13 +120,20 @@ export const updateContrato = async (req, res) => {
       });
     }
 
-    await findContrato.update(contrato);
+    // Si hay un nuevo documento, actualizar la URL
+    if (req.file) {
+      contratoData.urlDoc = req.file.path;
+    }
+
+    await findContrato.update(contratoData);
 
     return res.status(200).send({
       success: true,
       message: "Contrato actualizado",
+      data: findContrato,
     });
   } catch (e) {
+    console.log(e);
     return res.status(500).send({
       success: false,
       message: "Error al actualizar contrato",
